@@ -1,0 +1,7 @@
+# FinOps-Copilot 交互式 Streamlit Demo 的额外依赖。
+# 不要改 requirements.txt / pyproject.toml；本文件只声明 app/ 这一层需要什么。
+# 共享 venv 里已装好这些包，正常无需 pip install。
+streamlit>=1.30,<2
+pandas>=2.0
+PyYAML>=6.0,<7
+requests>=2.31

@@ -1,0 +1,532 @@
+{
+  "task": "task-8 real public data ingestion",
+  "generated_at": "2026-10-22T16:23:52+0800",
+  "internals": "see scripts/ingest_real_data.py",
+  "download": {
+    "skipped": true,
+    "reason": "already present; pass --force-download to refresh",
+    "source_key": "uci_online_retail_ii",
+    "url": "https://archive.ics.uci.edu/static/public/502/online+retail+ii.zip",
+    "landing_page": "https://archive.ics.uci.edu/dataset/502/online+retail+ii",
+    "license": "CC BY 4.0",
+    "local_file": "data/raw/online_retail_ii.zip",
+    "bytes": 45622418,
+    "sha256": "572e36277c2390fbfde10664750731e0a86f55e33470d91919085f0408e67bfb",
+    "downloaded_at": null,
+    "elapsed_seconds": null,
+    "file_mtime": "2026-10-22T16:01:43+0800",
+    "provenance_note": "本次下载由交互式 curl 完成（非本脚本）：HTTP 200，45,622,418 字节，耗时 1138.3 s，平均 40.1 KB/s（UCI 站点不支持 Range 断点续传，属于已知限制）"
+  },
+  "source_members": [
+    {
+      "member": "online_retail_II.xlsx",
+      "sheet": "Year 2009-2010",
+      "rows": 525461
+    },
+    {
+      "member": "online_retail_II.xlsx",
+      "sheet": "Year 2010-2011",
+      "rows": 541910
+    }
+  ],
+  "real_inventory": {
+    "rows_total": 1067371,
+    "rows_columns": [
+      "invoice",
+      "stockcode",
+      "description",
+      "quantity",
+      "invoicedate",
+      "price",
+      "customer",
+      "country",
+      "__source_member",
+      "__row_index"
+    ],
+    "time_min": "2009-12-01 07:45:00",
+    "time_max": "2011-12-09 12:50:00",
+    "rows_per_year": {
+      "2009": 45228,
+      "2010": 522714,
+      "2011": 499429
+    },
+    "distinct_invoice": 53628,
+    "distinct_stockcode": 5304,
+    "distinct_customer_known": 5942,
+    "distinct_country": 43,
+    "missing_customer_id": {
+      "rows": 243007,
+      "pct": 22.7669
+    },
+    "negative_quantity": {
+      "rows": 22950,
+      "pct": 2.1501
+    },
+    "price_zero": {
+      "rows": 6202,
+      "pct": 0.5811
+    },
+    "price_negative": {
+      "rows": 5,
+      "pct": 0.0005
+    },
+    "cancel_invoice_c": {
+      "rows": 19494,
+      "pct": 1.8264
+    },
+    "exact_duplicate_rows": {
+      "rows": 34337,
+      "pct": 3.217
+    },
+    "quantity_not_numeric": {
+      "rows": 0,
+      "pct": 0.0
+    },
+    "price_not_numeric": {
+      "rows": 0,
+      "pct": 0.0
+    },
+    "invoice_date_unparseable": {
+      "rows": 0,
+      "pct": 0.0
+    },
+    "missing_description": {
+      "rows": 4382,
+      "pct": 0.4105
+    },
+    "non_catalog_stockcode": {
+      "rows": 6093,
+      "pct": 0.5708,
+      "examples": [
+        "ADJUST",
+        "BANK CHARGES",
+        "C2",
+        "D",
+        "DCGS0003",
+        "DCGS0004",
+        "DCGS0044",
+        "DCGS0058",
+        "DCGS0066N",
+        "DCGS0068",
+        "DCGS0072",
+        "DCGS0076",
+        "DOT",
+        "M",
+        "PADS"
+      ]
+    },
+    "stockcode_multi_description": {
+      "codes": 1214,
+      "rows_affected": 420566,
+      "max_variants": 9,
+      "examples": {
+        "10080": 2,
+        "10120": 2,
+        "10133": 2,
+        "15056N": 2,
+        "15058A": 3,
+        "15058B": 2,
+        "15058C": 2,
+        "16008": 2
+      }
+    },
+    "stockcode_multiple_prices": {
+      "codes": 4710,
+      "rows_affected": 1065137,
+      "max_variants": 1291
+    },
+    "customer_multi_country": {
+      "customers": 13,
+      "rows_affected": 2190,
+      "max_variants": 2,
+      "examples": {
+        "12370": 2,
+        "12394": 2,
+        "12413": 2,
+        "12417": 2,
+        "12422": 2,
+        "12423": 2,
+        "12429": 2,
+        "12431": 2
+      }
+    },
+    "child_stockcode_with_parent": {
+      "rows": 2822,
+      "codes": 14,
+      "examples": [
+        "10002R",
+        "47556B",
+        "47559B",
+        "47566B",
+        "47567B",
+        "47567b",
+        "47570B",
+        "84292B"
+      ]
+    },
+    "exact_duplicate_composition": {
+      "dup_rows": 34337,
+      "distinct_dup_keys": 32909,
+      "repeat_groups_within_one_invoice": 32909,
+      "keys_spanning_multiple_invoices": 0,
+      "rows_spanning_multiple_invoices": 0,
+      "max_repeats_in_one_invoice": 19,
+      "verdict": "duplicates are dominated by same-invoice re-keying; de-duplicating them would delete legitimately recorded lines"
+    },
+    "cancel_and_negative_quantity_overlap": {
+      "rows": 19493,
+      "pct": 1.8263
+    },
+    "negative_quantity_without_cancel": {
+      "rows": 3457,
+      "pct": 0.3239
+    },
+    "refund_signal_on_non_cancel_row": {
+      "rows": 3457,
+      "pct": 0.3239
+    }
+  },
+  "normalization": {
+    "rows_input": 1067371,
+    "rows_dropped_untypeable": 0,
+    "rows_dropped_pct": 0.0,
+    "dropped_breakdown": {
+      "quantity_not_numeric": 0,
+      "price_not_numeric": 0,
+      "invoice_date_unparseable": 0
+    },
+    "kept_duplicate_rows": 34337,
+    "paid_amount_minor_total": 2097296812,
+    "refunded_amount_minor_total": 168571757,
+    "net_money_minor_total": 1928725055,
+    "gross_money_minor_all_rows": 1928725055,
+    "note_money": "paid-refunded over ALL rows reproduces sum(quantity*unit_price) exactly, including negative legs; status filtering is a separate step.",
+    "note_category": "category is set to SKU_<StockCode>; the real schema has no category column.",
+    "note_payment_channel": "payment_method/source_channel are the literal sentinel 'unknown': the real dataset carries no such columns. Any retention/refund analysis BY CHANNEL is therefore impossible on this source and must not be claimed.",
+    "note_status": "status is derived: InvoiceNo^C -> cancelled, Quantity<0 -> refunded, else completed. The real schema has no lifecycle column, so 'shipped' is never produced. This is an approximation, labelled as such.",
+    "note_discount_shipping": "discount_minor and shipping_fee_minor are hard 0: the real dataset records no discount or shipping split. Markdown/absolute-price semantics are unknown."
+  },
+  "database": {
+    "db_path": "data/processed/real_orders.db",
+    "rows_in_db": 1067371,
+    "integrity_check": "ok",
+    "rows_attempted": 1067371
+  },
+  "project_caliber": {
+    "revenue_statuses": [
+      "completed",
+      "shipped"
+    ],
+    "net_revenue_expr": "(paid_amount_minor - refunded_amount_minor)",
+    "queries": {
+      "{\"metric\": \"order_count\"}": {
+        "ok": true,
+        "sql": "SELECT COUNT(*) AS order_count FROM orders",
+        "params": [],
+        "rows": [
+          {
+            "order_count": 1067371
+          }
+        ],
+        "error": null
+      },
+      "{\"metric\": \"revenue\"}": {
+        "ok": true,
+        "sql": "SELECT ROUND(SUM((paid_amount_minor - refunded_amount_minor)) / 100.0, 2) AS revenue_yuan FROM orders WHERE status IN (?,?) AND quantity > 0",
+        "params": [
+          "completed",
+          "shipped"
+        ],
+        "rows": [
+          {
+            "revenue_yuan": 20813918.41
+          }
+        ],
+        "error": null
+      },
+      "{\"metric\": \"avg_order_value\"}": {
+        "ok": true,
+        "sql": "SELECT ROUND(AVG((paid_amount_minor - refunded_amount_minor)) / 100.0, 2) AS avg_order_value_yuan FROM orders WHERE status IN (?,?) AND quantity > 0",
+        "params": [
+          "completed",
+          "shipped"
+        ],
+        "rows": [
+          {
+            "avg_order_value_yuan": 19.93
+          }
+        ],
+        "error": null
+      },
+      "{\"metric\": \"cancel_rate\"}": {
+        "ok": true,
+        "sql": "SELECT ROUND(100.0 * SUM(CASE WHEN status = 'cancelled' OR status = 'refunded' THEN 1 ELSE 0 END) / COUNT(*), 2) AS cancel_rate_percent FROM orders",
+        "params": [],
+        "rows": [
+          {
+            "cancel_rate_percent": 2.15
+          }
+        ],
+        "error": null
+      },
+      "{\"dimension\": \"month\", \"metric\": \"revenue\"}": {
+        "ok": true,
+        "sql": "SELECT strftime('%Y-%m', order_time) AS group_key, ROUND(SUM((paid_amount_minor - refunded_amount_minor)) / 100.0, 2) AS revenue_yuan FROM orders WHERE status IN (?,?) AND quantity > 0 GROUP BY group_key ORDER BY group_key LIMIT ?",
+        "params": [
+          "completed",
+          "shipped",
+          20
+        ],
+        "rows": [
+          {
+            "group_key": "2009-12",
+            "revenue_yuan": 825685.76
+          },
+          {
+            "group_key": "2010-01",
+            "revenue_yuan": 652708.5
+          },
+          {
+            "group_key": "2010-02",
+            "revenue_yuan": 553339.73
+          },
+          {
+            "group_key": "2010-03",
+            "revenue_yuan": 833570.13
+          },
+          {
+            "group_key": "2010-04",
+            "revenue_yuan": 627934.63
+          },
+          {
+            "group_key": "2010-05",
+            "revenue_yuan": 659858.86
+          },
+          {
+            "group_key": "2010-06",
+            "revenue_yuan": 752270.14
+          },
+          {
+            "group_key": "2010-07",
+            "revenue_yuan": 606681.15
+          },
+          {
+            "group_key": "2010-08",
+            "revenue_yuan": 697274.91
+          },
+          {
+            "group_key": "2010-09",
+            "revenue_yuan": 924333.01
+          },
+          {
+            "group_key": "2010-10",
+            "revenue_yuan": 1126558.04
+          },
+          {
+            "group_key": "2010-11",
+            "revenue_yuan": 1470272.48
+          },
+          {
+            "group_key": "2010-12",
+            "revenue_yuan": 1262598.79
+          },
+          {
+            "group_key": "2011-01",
+            "revenue_yuan": 691364.56
+          },
+          {
+            "group_key": "2011-02",
+            "revenue_yuan": 523631.89
+          },
+          {
+            "group_key": "2011-03",
+            "revenue_yuan": 717639.36
+          },
+          {
+            "group_key": "2011-04",
+            "revenue_yuan": 537808.62
+          },
+          {
+            "group_key": "2011-05",
+            "revenue_yuan": 770536.02
+          },
+          {
+            "group_key": "2011-06",
+            "revenue_yuan": 761739.9
+          },
+          {
+            "group_key": "2011-07",
+            "revenue_yuan": 719221.19
+          }
+        ],
+        "error": null
+      },
+      "{\"dimension\": \"status\", \"metric\": \"order_count\"}": {
+        "ok": true,
+        "sql": "SELECT status AS group_key, COUNT(*) AS order_count FROM orders GROUP BY group_key ORDER BY group_key LIMIT ?",
+        "params": [
+          20
+        ],
+        "rows": [
+          {
+            "group_key": "cancelled",
+            "order_count": 19494
+          },
+          {
+            "group_key": "completed",
+            "order_count": 1044420
+          },
+          {
+            "group_key": "refunded",
+            "order_count": 3457
+          }
+        ],
+        "error": null
+      }
+    },
+    "cross_check_sqlite": {
+      "table_rows": 1067371,
+      "net_revenue_minor_all_rows": 1928725055,
+      "net_revenue_minor_status_filtered": 2081391841,
+      "net_revenue_minor_positive_quantity_only": 2081429198,
+      "net_revenue_minor_cancelled_quarantined": -152666786,
+      "rows_with_unsupported_status": [],
+      "rows_where_paid_minus_refunded_ne_quantity_x_price": 0,
+      "note_revenue_status_filtered_vs_all": "The project caliber only counts completed/shipped; on this real data that silently drops the entire refund leg, which is why both numbers are reported."
+    }
+  },
+  "synthetic_baseline": {
+    "available": true,
+    "rows_total": 50000,
+    "distinct_customer_id": 9945,
+    "distinct_merchant_id": 50,
+    "distinct_category": 4,
+    "distinct_source_channel": 5,
+    "distinct_payment_method": 4,
+    "missing_customer_id": {
+      "rows": 0,
+      "pct": 0.0
+    },
+    "negative_quantity": {
+      "rows": 500,
+      "pct": 1.0
+    },
+    "price_zero": {
+      "rows": 0,
+      "pct": 0.0
+    },
+    "price_negative": {
+      "rows": 0,
+      "pct": 0.0
+    },
+    "cancel_invoice_c": {
+      "rows": 0,
+      "pct": 0.0,
+      "note": "synthetic uses a status column, not invoice prefixes"
+    },
+    "exact_duplicate_rows": {
+      "rows": 0,
+      "pct": 0.0
+    },
+    "invoice_date_unparseable": {
+      "rows": 500,
+      "pct": 1.0
+    },
+    "payment_method_unknown": {
+      "rows": 0,
+      "pct": 0.0
+    },
+    "source_channel_unknown": {
+      "rows": 0,
+      "pct": 0.0
+    },
+    "refund_exceeds_paid": {
+      "rows": 500,
+      "pct": 1.0
+    },
+    "injected_anomalies": {
+      "total": 3000,
+      "by_type": {
+        "unknown_channel": 500,
+        "malformed_order_time": 500,
+        "unsupported_status": 500,
+        "refund_exceeds_paid": 500,
+        "paid_amount_mismatch": 500,
+        "negative_quantity": 500
+      }
+    },
+    "note_columns_present_real_missing": "The synthetic contract HAS status/category/merchant/discount/shipping/payment/channel; the real dataset has NONE of them."
+  },
+  "column_mapping": [
+    {
+      "real_column": "InvoiceNo",
+      "contract_column": "order_id",
+      "transform": "hash to INV<sha1[:10]>; C-prefix is preserved in status, not in the id"
+    },
+    {
+      "real_column": "Customer ID",
+      "contract_column": "customer_id",
+      "transform": "CUS<zero-padded 6 digits>; null -> CUS_UNKNOWN (measured rate is printed in the report)"
+    },
+    {
+      "real_column": "(none)",
+      "contract_column": "merchant_id",
+      "transform": "constant MRC_REAL_01 (single retailer in the source)"
+    },
+    {
+      "real_column": "InvoiceDate",
+      "contract_column": "order_time",
+      "transform": "minute resolution, stamped +00:00 (source has no timezone)"
+    },
+    {
+      "real_column": "(none)",
+      "contract_column": "status",
+      "transform": "derived: C-invoice->cancelled, Quantity<0->refunded, else completed"
+    },
+    {
+      "real_column": "StockCode",
+      "contract_column": "category",
+      "transform": "SKU_<StockCode>; real data has no product category hierarchy"
+    },
+    {
+      "real_column": "Quantity",
+      "contract_column": "quantity",
+      "transform": "int, negatives kept"
+    },
+    {
+      "real_column": "UnitPrice",
+      "contract_column": "unit_price_minor",
+      "transform": "GBP float -> pence: round(x*100)"
+    },
+    {
+      "real_column": "(none)",
+      "contract_column": "discount_minor",
+      "transform": "hard 0 (not recorded)"
+    },
+    {
+      "real_column": "(none)",
+      "contract_column": "shipping_fee_minor",
+      "transform": "hard 0 (not recorded)"
+    },
+    {
+      "real_column": "Quantity*UnitPrice",
+      "contract_column": "paid_amount_minor",
+      "transform": "max(gross,0) in pence on the sale leg"
+    },
+    {
+      "real_column": "Quantity*UnitPrice",
+      "contract_column": "refunded_amount_minor",
+      "transform": "max(-gross,0) in pence on the negative leg"
+    },
+    {
+      "real_column": "(none)",
+      "contract_column": "payment_method",
+      "transform": "sentinel 'unknown'"
+    },
+    {
+      "real_column": "(none)",
+      "contract_column": "source_channel",
+      "transform": "sentinel 'unknown'"
+    }
+  ]
+}

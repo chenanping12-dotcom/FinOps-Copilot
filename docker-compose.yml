@@ -1,0 +1,102 @@
+# FinOps-Copilot 单机部署编排（Docker Compose v2 语法）。
+#
+# ⚠️ 诚实声明：本机没有 Docker，这份文件只做过「YAML 合法性 + 字段结构」校验，
+# 从未真正执行过 `docker compose up`。详见 DEPLOY.md 的「未验证项」。
+#
+# 用法：
+#   docker compose build
+#   docker compose up -d
+#   docker compose ps            # 两个服务都应是 healthy
+#   docker compose logs -f ui
+#   docker compose down
+#
+# 一个镜像两个服务：api 用镜像默认 CMD（python serve_gateway.py），
+# ui 用 command 覆盖成 Streamlit —— 这就是 Dockerfile 里 CMD + compose 覆盖的设计。
+
+name: finops-copilot
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: finops-copilot:0.1.0
+    command: ["python", "serve_gateway.py"]
+    init: true
+    restart: unless-stopped
+    environment:
+      PORT: "8000"
+      # 主备 Provider：逗号分隔。每个名字对应一个 LLM_BASE_URL_<NAME>（回退到 LLM_BASE_URL）。
+      # 例：LLM_PROVIDERS=primary,backup 时可用 LLM_BASE_URL_PRIMARY / LLM_BASE_URL_BACKUP。
+      LLM_PROVIDERS: "${LLM_PROVIDERS:-primary}"
+      LLM_BASE_URL: "${LLM_BASE_URL:-}"
+      LLM_API_KEY: "${LLM_API_KEY:-}"
+      LLM_TIMEOUT_SECONDS: "${LLM_TIMEOUT_SECONDS:-30}"
+      CACHE_THRESHOLD: "${CACHE_THRESHOLD:-0.95}"
+      # 模型缓存已在宿主机的 models/huggingface 里；设 1 可以「缺文件就报错」而不是悄悄重下 1.2G。
+      HF_HUB_OFFLINE: "${HF_HUB_OFFLINE:-0}"
+    ports:
+      # ⚠️ 8000 暴露的是**无鉴权**的 /chat，它会用你的 LLM_API_KEY 去调上游。
+      # 只想给面试官看 demo 时，请把下面这行注释掉（UI 内部会自己起 demo 网关）。
+      - "8000:8000"
+    volumes:
+      # 模型缓存：不 COPY 进镜像，1.2G 走挂载（config/rag.yaml: retrieval.model_cache）
+      - ./models/huggingface:/app/models/huggingface
+      # 数据：data/generated 与 *.db 都被 .gitignore 忽略，镜像构建时不存在，必须挂载
+      - ./data:/app/data
+      # 配置只读挂载：改 rag.yaml 的 top_k/candidate_k 不用重建镜像
+      - ./config:/app/config:ro
+      # 评测产物落回宿主机
+      - ./eval/reports:/app/eval/reports
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: finops-copilot:0.1.0
+    command:
+      - streamlit
+      - run
+      - app/streamlit_app.py
+      - --server.address=0.0.0.0
+      - --server.port=8501
+      - --server.headless=true
+      - --browser.gatherUsageStats=false
+    init: true
+    restart: unless-stopped
+    depends_on:
+      api:
+        # 等 api 的 HEALTHCHECK 通过再起 UI，避免首屏就报「网关未启动」
+        condition: service_healthy
+    environment:
+      # app/streamlit_app.py:517 读这个变量（默认 http://127.0.0.1:8000，容器里必须换成服务名）
+      FINOPS_GATEWAY_URL: "http://api:8000"
+      HF_HUB_OFFLINE: "${HF_HUB_OFFLINE:-0}"
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./models/huggingface:/app/models/huggingface
+      - ./data:/app/data
+      - ./config:/app/config:ro
+      - ./eval/reports:/app/eval/reports
+    healthcheck:
+      # Streamlit 自带的健康端点
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8501/_stcore/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+
+# ── 可选：一次性数据生成（本仓库默认数据已在本机 data/ 里，走挂载即可） ──
+# 如果你是从 git clone 出来的干净副本（data/generated 为空），先跑一次生成器：
+#   docker compose run --rm api python scripts/generate_dataset.py --config config/data_spec.yaml
+#   docker compose run --rm api python scripts/generate_eval_set.py --config config/data_spec.yaml
+#   docker compose run --rm api python scripts/build_orders_db.py --config config/data_spec.yaml
+# 生成物会通过 ./data 挂载写回宿主机，之后删容器也不丢。
+# 注意：生成器遇到已有输出会停止，不会覆盖（README.md:41）。

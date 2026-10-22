@@ -27,11 +27,16 @@ def rerank_sort_key(hit: RetrievalHit) -> tuple[float, float, int, int, str]:
     all of them tie and the remaining keys decide the order outright.
 
     Falling back to `chunk_id` made the final ordering alphabetical -- arbitrary
-    for this purpose. It pushed the gold chunk `POL-068-V2-C04` from rank 2
-    (where RRF had it) down to rank 8, out of top-5, so Hybrid+Rerank scored
-    *worse* than plain BM25. Falling back to `rrf_score` instead keeps the
-    lexical/vector consensus as the deciding signal, and RRF demonstrably
-    ranks the gold correctly here.
+    for this purpose. It is tempting to blame the tie-break alone, but recomputing
+    the order over the recorded scores with four different sorting keys leaves gold
+    `POL-068-V2-C04` at rank 8 every time: six near-duplicate siblings differing
+    only by a scope clause outscore it by ~1e-6, so the tie-break never gets to
+    decide. The rank-2 figure quoted elsewhere was measured *before* reranking, on
+    a different curve, and is not evidence that the tie-break pushed gold from 2 to
+    8. What removes those siblings from the candidate set is narrowing the window
+    (100 -> 20); switching the fallback from `chunk_id` to `rrf_score` keeps the
+    lexical/vector consensus as the deciding signal and is the supporting fix,
+    after which gold returns to rank 4 and Recall@5 recovers to 1.0000.
 
     The per-arm ranks come next (preserving whichever retriever was confident),
     with `chunk_id` last purely so the order is total and deterministic -- a

@@ -1,0 +1,50 @@
+# Docker 构建上下文排除清单。作用有两个：缩小构建上下文（1.2G 模型 + .venv 不进 daemon），
+# 以及防止大件被 COPY 进镜像。注意：模型与数据是**故意**不 COPY、改用 volume 挂载的，
+# 见 DEPLOY.md「数据与模型：为什么用 volume」。
+
+# ── 虚拟环境与缓存 ──
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ── 模型权重（1.2G，绝不打进镜像）──
+models/
+
+# ── 生成数据（6.3MB orders.csv、*.db 都被 .gitignore 忽略，镜像里不该有）──
+data/generated/
+data/processed/
+data/raw/
+*.sqlite
+*.sqlite3
+*.db
+
+# ── 评测报告与运行报告 ──
+eval/reports/
+reports/
+
+# ── 版本控制与本地环境文件 ──
+.git/
+.gitignore
+.env
+.env.*
+!.env.example
+
+# ── 不需要进运行镜像的开发件 ──
+tests/
+docs/
+.pytest_cache/
+*.md
+!README.md
+
+# ── 本任务的交付文档（镜像里用不到）──
+DEPLOY.md

@@ -14,8 +14,10 @@ htmlcov/
 !.env.example
 
 # Generated datasets can be large and are reproducible from config/data_spec.yaml.
+# data/raw/ 只提交来源说明，下载到的原始大文件（zip/csv）不入库。
 data/raw/*
 !data/raw/.gitkeep
+!data/raw/README.md
 data/generated/*
 !data/generated/.gitkeep
 data/processed/*

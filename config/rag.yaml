@@ -33,10 +33,16 @@ retrieval:
     max_length: 384
     # 100 -> 20, decided by the Stage 2 window sweep (see
     # reports/stage2_retrieval_findings.md option A). On this synthetic corpus the
-    # Cross-Encoder saturates (all 100 candidates within a 0.0034 score band), so a
-    # wider window only feeds near-duplicates into the tie-break and pushes gold
-    # out of top-5. Measured: window 20 gives Recall@5 1.0000 / MRR@5 0.6133 at
-    # ~1069 ms per query, versus Recall@5 0.9889 / MRR@5 0.6106 / 4586 ms at 100.
+    # Cross-Encoder saturates (all 100 candidates inside a 0.0034 score band, only
+    # 52 distinct values), and six near-duplicate siblings that differ by one scope
+    # clause outscore gold by ~1e-6, so a wider window leaves gold at rank 8 under
+    # any tie-break; narrowing the window removes those siblings from the candidate
+    # set. Measured (window sweep): window 20 gives Recall@5 1.0000 / MRR@5 0.6133
+    # at ~1069 ms per query, versus Recall@5 0.9889 / MRR@5 0.6106 / 4586 ms at 100.
+    # NOTE on latency bases -- the two numbers above are from the window sweep.
+    # eval/reports/rag/latency_window_crosscheck.json reports a second basis
+    # (3450 -> 715 ms, two-round alternating cross-check) and ablation.json a third
+    # (6564 -> 771 ms). They are different measurement setups; quote the one you mean.
     candidate_k: 20
   top_k: 5
   device: auto

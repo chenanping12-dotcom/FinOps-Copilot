@@ -1,0 +1,85 @@
+{
+  "rows_real": 1067371,
+  "rows_synthetic": 50000,
+  "classes": [
+    {
+      "class": "缺失 customer/Customer ID",
+      "real_rows": 243007,
+      "real_pct": 22.7669,
+      "synthetic_rows": 0,
+      "synthetic_pct": 0.0
+    },
+    {
+      "class": "负数量（退货/取消腿）",
+      "real_rows": 22950,
+      "real_pct": 2.1501,
+      "synthetic_rows": 500,
+      "synthetic_pct": 1.0
+    },
+    {
+      "class": "单价为 0",
+      "real_rows": 6202,
+      "real_pct": 0.5811,
+      "synthetic_rows": 0,
+      "synthetic_pct": 0.0
+    },
+    {
+      "class": "单价为负",
+      "real_rows": 5,
+      "real_pct": 0.0005,
+      "synthetic_rows": 0,
+      "synthetic_pct": 0.0
+    },
+    {
+      "class": "InvoiceNo 以 C 开头（取消单）",
+      "real_rows": 19494,
+      "real_pct": 1.8264,
+      "synthetic_rows": 0,
+      "synthetic_pct": 0.0
+    },
+    {
+      "class": "完全重复行",
+      "real_rows": 34337,
+      "real_pct": 3.217,
+      "synthetic_rows": 0,
+      "synthetic_pct": 0.0
+    },
+    {
+      "class": "时间不可解析",
+      "real_rows": 0,
+      "real_pct": 0.0,
+      "synthetic_rows": 500,
+      "synthetic_pct": 1.0
+    },
+    {
+      "class": "退款超过已付",
+      "real_rows": null,
+      "real_pct": null,
+      "synthetic_rows": 500,
+      "synthetic_pct": 1.0
+    }
+  ],
+  "real_net_revenue_minor_all": 1928725055,
+  "real_net_revenue_minor_project_caliber": 2081391841,
+  "real_refund_leg_minor": -152666786,
+  "synthetic_injected_anomalies": {
+    "total": 3000,
+    "by_type": {
+      "unknown_channel": 500,
+      "malformed_order_time": 500,
+      "unsupported_status": 500,
+      "refund_exceeds_paid": 500,
+      "paid_amount_mismatch": 500,
+      "negative_quantity": 500
+    }
+  },
+  "exact_duplicate_composition": {
+    "dup_rows": 34337,
+    "distinct_dup_keys": 32909,
+    "repeat_groups_within_one_invoice": 32909,
+    "keys_spanning_multiple_invoices": 0,
+    "rows_spanning_multiple_invoices": 0,
+    "max_repeats_in_one_invoice": 19,
+    "verdict": "duplicates are dominated by same-invoice re-keying; de-duplicating them would delete legitimately recorded lines"
+  }
+}
