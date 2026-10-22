@@ -8,7 +8,14 @@ cd FinOps-Copilot
 
 命令行自检（不启 UI，直接跑 RAG 溯源 + Agent 三路由）：`.venv/Scripts/python.exe app/smoke_check.py`
 
-## 与 src/ 真实 API 对不上的地方（只记录，未修改 src/）
+> **断网也能跑（2026-10-22 修）**：模型已在 `models/huggingface/` 时，`src/rag/hf_cache.py`
+> 会自动把进程切成离线模式。此前断网会报
+> `ValueError: Unrecognized processing class in BAAI/bge-small-zh-v1.5` ——
+> `transformers` 5.x 请求 huggingface.co 失败后抛的是 `ValueError`，不在
+> `build_embedder()` 的降级 except 列表里，会把整个检索器构造打挂（**模型明明就在本地**）。
+> 现在冷机器仍正常联网下载，热机器完全不碰网络。回归测试见 `tests/unit/test_hf_cache.py`。
+
+## 与 src/ 真实 API 对不上的地方（第 1 条已于 2026-10-22 修复，其余只记录）
 
 1. **首屏慢的主因不是 Cross-Encoder，而是 DenseRetriever 构造**：`src/rag/dense.py:139`
    在 `__init__` 里对全部 5,000 切片做一次 `embedder.encode(...)`，且没有落盘缓存；

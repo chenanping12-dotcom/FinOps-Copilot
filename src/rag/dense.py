@@ -10,6 +10,7 @@ from typing import Any, Protocol
 
 from .bm25 import tokenize
 from .corpus import ParentChildCorpus
+from .hf_cache import enable_offline_if_cached
 from .models import RetrievalHit
 
 
@@ -74,6 +75,9 @@ class SentenceTransformerEmbedder:
         revision: str | None = None,
         normalize_embeddings: bool = True,
     ) -> None:
+        # 必须在 import sentence_transformers 之前：模型已在本地就切离线模式，
+        # 否则 transformers 会去请求 huggingface.co，断网时抛 ValueError 打挂构造。
+        enable_offline_if_cached(cache_folder, model_name)
         try:
             from sentence_transformers import SentenceTransformer
         except ImportError as exc:

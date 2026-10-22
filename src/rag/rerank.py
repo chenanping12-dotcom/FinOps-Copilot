@@ -7,6 +7,7 @@ import re
 from typing import Any, Protocol
 
 from .bm25 import tokenize
+from .hf_cache import enable_offline_if_cached
 from .models import RetrievalHit
 
 
@@ -115,6 +116,9 @@ class SentenceTransformerReranker:
         max_length: int = 384,
         revision: str | None = None,
     ) -> None:
+        # 同 dense.py：模型已在本地就切离线模式，避免断网时 transformers 抛
+        # ValueError 打挂构造。
+        enable_offline_if_cached(cache_folder, model_name)
         try:
             from sentence_transformers import CrossEncoder
         except ImportError as exc:

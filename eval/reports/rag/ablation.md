@@ -1,15 +1,15 @@
 # Stage 2 检索消融对比
 
-- 生成时间: 2026-10-21T13:57:15.823248+00:00
+- 生成时间: 2026-10-22T14:16:05.593207+00:00
 - 语料切片: 5000   评测题: 120   k=5
 - Embedding: `BAAI/bge-small-zh-v1.5` (sentence_transformers)
 - Reranker: `BAAI/bge-reranker-base` (sentence_transformers_cross_encoder)
 
 | 检索方案 | Recall@5 | MRR@5 | 平均延迟(ms) |
 | --- | ---: | ---: | ---: |
-| 纯 BM25（词法） | 1.0000 | 0.5000 | 7.92 |
-| 纯向量（BGE 双塔） | 0.9667 | 0.4646 | 13.51 |
-| Hybrid + Rerank（BM25+Dense→RRF→CrossEncoder） | 1.0000 | 0.6133 | 771.15 |
+| 纯 BM25（词法） | 1.0000 | 0.5000 | 8.14 |
+| 纯向量（BGE 双塔） | 0.9667 | 0.4646 | 11.27 |
+| Hybrid + Rerank（BM25+Dense→RRF→CrossEncoder） | 1.0000 | 0.6133 | 631.76 |
 
 计入题数 90，排除不可回答题 30。
 

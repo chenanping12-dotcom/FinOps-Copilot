@@ -5,16 +5,16 @@
     "hybrid_rerank": "Hybrid + Rerank（BM25+Dense→RRF→CrossEncoder）"
   },
   "avg_latency_ms": {
-    "bm25": 7.9168049999073755,
-    "dense": 13.514490000018972,
-    "hybrid_rerank": 771.1497241666015
+    "bm25": 8.142081666634718,
+    "dense": 11.269612499988094,
+    "hybrid_rerank": 631.756533333252
   },
   "bad_case_count": 0,
   "bad_cases": [],
   "corpus_chunks": 5000,
   "embedder_backend": "sentence_transformers",
   "embedder_model": "BAAI/bge-small-zh-v1.5",
-  "generated_at": "2026-10-21T13:57:15.823248+00:00",
+  "generated_at": "2026-10-22T14:16:05.593207+00:00",
   "is_full_evaluation_set": true,
   "k": 5,
   "limit": null,
