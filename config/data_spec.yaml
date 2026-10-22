@@ -1,0 +1,307 @@
+project:
+  name: finops-copilot
+  stage: stage_1
+  synthetic_only: true
+  random_seed: 20261021
+
+orders:
+  target_rows: 50000
+  output:
+    directory: data/generated/orders
+    filename: orders.csv
+    encoding: utf-8
+    anomaly_labels_filename: anomaly_labels.jsonl
+    overwrite_existing: false
+
+  schema:
+    - name: order_id
+      type: string
+      nullable: false
+      description: Unique synthetic order identifier.
+    - name: customer_id
+      type: string
+      nullable: false
+      description: Synthetic pseudonymous customer identifier.
+    - name: merchant_id
+      type: string
+      nullable: false
+      description: Synthetic merchant identifier.
+    - name: order_time
+      type: datetime
+      nullable: false
+      description: ISO-8601 order time with Asia/Shanghai UTC+08:00 offset.
+    - name: status
+      type: string
+      nullable: false
+      description: Synthetic lifecycle state.
+    - name: category
+      type: string
+      nullable: false
+      description: One of four synthetic product categories.
+    - name: quantity
+      type: integer
+      nullable: false
+      description: Positive units per order line; one injected anomaly may be negative.
+    - name: unit_price_minor
+      type: integer
+      nullable: false
+      description: Unit price in CNY fen (integer minor units).
+    - name: discount_minor
+      type: integer
+      nullable: false
+      description: Order-level discount in CNY fen, non-negative.
+    - name: shipping_fee_minor
+      type: integer
+      nullable: false
+      description: Customer-paid shipping fee in CNY fen.
+    - name: paid_amount_minor
+      type: integer
+      nullable: false
+      description: quantity * unit_price_minor - discount_minor + shipping_fee_minor.
+    - name: refunded_amount_minor
+      type: integer
+      nullable: false
+      description: Refund amount in CNY fen; normally between zero and paid amount.
+    - name: payment_method
+      type: string
+      nullable: false
+      description: Synthetic payment method.
+    - name: source_channel
+      type: string
+      nullable: false
+      description: One of four synthetic acquisition channels.
+
+  business_semantics:
+    currency: CNY
+    amount_storage_unit: fen
+    amount_display_unit: yuan
+    amount_display_rule: Divide integer fen by 100 and display exactly two decimal places.
+    revenue_statuses: [completed, shipped]
+    net_revenue_formula: paid_amount_minor - refunded_amount_minor
+    revenue_formula: Sum net_revenue_formula only for rows whose status is completed or shipped.
+    order_count_definition: Every row is one synthetic order; invalid rows remain present for data-quality evaluation.
+    date_field_for_reporting: order_time
+    reporting_timezone: Asia/Shanghai
+    status_semantics: Status is evaluated as stored; do not infer revenue from payment alone.
+
+  dimensions:
+    customer_count: 10000
+    merchants:
+      count: 50
+      id_prefix: MRC
+      distribution: uniform
+    categories:
+      # TODO(HUMAN): 当前为合成默认；如需映射实际业务，请替换类目枚举与占比。用户已确认类别数量为 4。
+      - id: electronics
+        share: 0.25
+      - id: home_living
+        share: 0.25
+      - id: apparel
+        share: 0.25
+      - id: beauty_personal_care
+        share: 0.25
+    statuses:
+      - id: completed
+        share: 0.50
+      - id: shipped
+        share: 0.18
+      - id: pending
+        share: 0.08
+      - id: cancelled
+        share: 0.10
+      - id: refunded
+        share: 0.14
+    payment_methods:
+      - alipay
+      - wechat_pay
+      - bank_card
+      - platform_wallet
+    source_channels:
+      # TODO(HUMAN): 当前为合成默认；如需映射实际业务，请替换渠道枚举与占比。用户已确认渠道数量为 4。
+      - id: app
+        share: 0.35
+      - id: mini_program
+        share: 0.30
+      - id: web
+        share: 0.20
+      - id: marketplace
+        share: 0.15
+
+  date_range:
+    start: "2025-01-01"
+    end: "2025-12-31"
+    end_inclusive: true
+    # TODO(HUMAN): 合成默认的活动占比、日期与窗口宽度，可在确定业务活动日历后调整。
+    campaign_probability: 0.20
+    campaign_window_radius_days: 3
+    campaign_dates:
+      - "2025-06-18"
+      - "2025-11-11"
+    baseline_distribution: Uniform across non-campaign dates and seconds within a day.
+    campaign_distribution: Uniform across configured campaign windows and seconds within a day.
+
+  generation_defaults:
+    # 合成默认参数：用于生成形态合理、金额关系可校验的订单，不代表真实业务分布。
+    quantity_range_inclusive: [1, 5]
+    unit_price_minor_by_category:
+      electronics: [15000, 2500000]
+      home_living: [5000, 450000]
+      apparel: [2000, 120000]
+      beauty_personal_care: [1500, 80000]
+    normal_discount_rate_range: [0.0, 0.15]
+    campaign_discount_rate_range: [0.05, 0.30]
+    shipping_fee_probability: 0.35
+    shipping_fee_minor_range: [500, 2500]
+    completed_or_shipped_partial_refund_probability: 0.05
+    partial_refund_rate_range: [0.10, 0.50]
+    refunded_status_refund_rate_range: [0.50, 1.00]
+
+  dirty_data:
+    target_row_rate: 0.06
+    overlap_policy: exactly_one_anomaly_per_dirty_row
+    ground_truth:
+      enabled: true
+      sidecar_filename: anomaly_labels.jsonl
+      expose_labels_to_agent: false
+    # TODO(HUMAN): 异常类型为合成默认；六类各占全量记录 1%，在 50,000 行时每类 500 条。
+    rules:
+      - id: negative_quantity
+        field: quantity
+        rate_of_all_rows: 0.01
+        generation_rule: Set quantity to -1.
+        expected_handling: Quarantine the row and flag a non-positive quantity.
+      - id: unsupported_status
+        field: status
+        rate_of_all_rows: 0.01
+        generation_rule: Set status to legacy_in_transit, outside the canonical status list.
+        expected_handling: Reject the status for canonical revenue aggregation and flag it for mapping.
+      - id: refund_exceeds_paid
+        field: refunded_amount_minor
+        rate_of_all_rows: 0.01
+        generation_rule: Set refunded_amount_minor to paid_amount_minor + 1.
+        expected_handling: Flag the refund as financially inconsistent; do not silently clamp it.
+      - id: paid_amount_mismatch
+        field: paid_amount_minor
+        rate_of_all_rows: 0.01
+        generation_rule: Add 137 fen to the correctly generated paid amount.
+        expected_handling: Recompute against quantity, unit price, discount, and shipping fee; flag mismatch.
+      - id: malformed_order_time
+        field: order_time
+        rate_of_all_rows: 0.01
+        generation_rule: Replace the ISO-8601 timestamp with not-a-timestamp.
+        expected_handling: Quarantine the row from time-based reporting and flag parse failure.
+      - id: unknown_channel
+        field: source_channel
+        rate_of_all_rows: 0.01
+        generation_rule: Set source_channel to partner_feed_x, outside the canonical channel list.
+        expected_handling: Flag for channel mapping; do not silently merge into a known channel.
+
+rule_documents:
+  target_chunks: 5000
+  output:
+    directory: data/generated/rule_docs
+    documents_subdirectory: documents
+    chunks_filename: chunks.jsonl
+    encoding: utf-8
+  document_families:
+    # 合成规则主题；均为示例内容，不代表真实平台或法律合规意见。
+    - order_lifecycle
+    - revenue_recognition
+    - refund_accounting
+    - discount_allocation
+    - shipping_fee_settlement
+    - merchant_settlement
+    - channel_attribution
+    - payment_capture
+    - fulfillment_confirmation
+    - cancellation_handling
+    - duplicate_order_handling
+    - reporting_timezone
+    - category_eligibility
+    - return_window
+    - partial_refund
+    - chargeback_handling
+    - merchant_fee
+    - promotion_stacking
+    - split_shipment
+    - reconciliation_tolerance
+    - order_date_basis
+    - tax_documentation
+    - coupon_eligibility
+    - inventory_reservation
+    - data_quality_review
+  scopes:
+    - global
+    - electronics
+    - home_living
+    - apparel
+    - beauty_personal_care
+  document_count: 250
+  chunks_per_document_target: 20
+  version_policy:
+    versions: [V1, V2]
+    # TODO(HUMAN): 生效日期及版本冲突是评测用合成默认，不代表真实法规或平台制度。
+    v1_effective_from: "2025-01-01"
+    v2_effective_from: "2025-07-01"
+    precedence: Use the version effective on the queried business date; V2 is authoritative for current-date questions.
+    retain_superseded_versions: true
+  authority_policy: Explicit effective dates govern; a newer version supersedes an older version from its effective date.
+  synthetic_parameters:
+    # TODO(HUMAN): 合成默认，仅用于构造可检验的边界题，不作为真实平台售后承诺。
+    refund_window_days_by_scope:
+      global: 7
+      electronics: 7
+      home_living: 15
+      apparel: 7
+      beauty_personal_care: 7
+    reconciliation_tolerance_minor: 100
+  chunking:
+    strategy: One heading-aware policy clause per chunk, with no overlap.
+    target_tokens: 180
+    overlap_tokens: 0
+    metadata_fields: [doc_id, version, page, line_start, line_end, chunk_id]
+  retrieval_traps:
+    # TODO(HUMAN): 四类陷阱是离线评测用合成默认，不代表已验证的生产风险分布。
+    taxonomy:
+      - id: version_conflict
+        description: Current V2 policy conflicts with a superseded V1 clause.
+      - id: boundary_exception
+        description: Inclusive threshold and exception wording must be read precisely.
+      - id: negation_lexical_decoy
+        description: Similar words appear in a nearby clause, but negation changes the answer.
+      - id: unanswerable
+        description: Corpus contains related context but no evidence that answers the requested fact.
+    questions_per_type: 30
+
+evaluation:
+  target_qa_pairs: 120
+  split:
+    development: 60
+    validation: 30
+    holdout: 30
+  output:
+    directory: eval/datasets
+    filename: stage1_eval.jsonl
+  fields:
+    - question_id
+    - split
+    - trap_type
+    - query
+    - expected_answer
+    - must_abstain
+    - gold_doc_ids
+    - gold_chunk_ids
+    - hard_negative_chunk_ids
+    - rationale
+  metrics:
+    - recall_at_k
+    - mrr_at_k
+    - precision_at_k
+    - citation_support_rate
+  report_note: Synthetic corpus results are offline evaluation results, not production accuracy.
+
+artifacts:
+  manifest_path: reports/stage1_manifest.json
+  include_config_snapshot: true
+  include_sha256: true
+  fail_if_output_exists: true

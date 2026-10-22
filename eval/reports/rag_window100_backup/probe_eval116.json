@@ -1,0 +1,920 @@
+{
+  "cross_encoder_scores": [
+    {
+      "chunk_id": "POL-053-V1-C04",
+      "in_final_top_k": true,
+      "is_gold": false,
+      "rerank_rank": 1,
+      "rerank_score": 0.9998589754104614,
+      "rrf_score": 0.022366965712178936
+    },
+    {
+      "chunk_id": "POL-053-V2-C04",
+      "in_final_top_k": true,
+      "is_gold": false,
+      "rerank_rank": 2,
+      "rerank_score": 0.9998589754104614,
+      "rrf_score": 0.02181050656660413
+    },
+    {
+      "chunk_id": "POL-028-V1-C04",
+      "in_final_top_k": true,
+      "is_gold": false,
+      "rerank_rank": 3,
+      "rerank_score": 0.9998528957366943,
+      "rrf_score": 0.028169014084507043
+    },
+    {
+      "chunk_id": "POL-028-V2-C04",
+      "in_final_top_k": true,
+      "is_gold": false,
+      "rerank_rank": 4,
+      "rerank_score": 0.9998528957366943,
+      "rrf_score": 0.026709401709401708
+    },
+    {
+      "chunk_id": "POL-003-V1-C04",
+      "in_final_top_k": true,
+      "is_gold": false,
+      "rerank_rank": 5,
+      "rerank_score": 0.9998505115509033,
+      "rrf_score": 0.02005928853754941
+    },
+    {
+      "chunk_id": "POL-003-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 6,
+      "rerank_score": 0.9998505115509033,
+      "rrf_score": 0.019490254872563718
+    },
+    {
+      "chunk_id": "POL-068-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 7,
+      "rerank_score": 0.9998477697372437,
+      "rrf_score": 0.03278688524590164
+    },
+    {
+      "chunk_id": "POL-068-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": true,
+      "rerank_rank": 8,
+      "rerank_score": 0.9998477697372437,
+      "rrf_score": 0.03225806451612903
+    },
+    {
+      "chunk_id": "POL-018-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 9,
+      "rerank_score": 0.9998476505279541,
+      "rrf_score": 0.02200402224062463
+    },
+    {
+      "chunk_id": "POL-018-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 10,
+      "rerank_score": 0.9998476505279541,
+      "rrf_score": 0.02159090909090909
+    },
+    {
+      "chunk_id": "POL-063-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 11,
+      "rerank_score": 0.9998472929000854,
+      "rrf_score": 0.025910931174089068
+    },
+    {
+      "chunk_id": "POL-063-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 12,
+      "rerank_score": 0.9998472929000854,
+      "rrf_score": 0.025122549019607844
+    },
+    {
+      "chunk_id": "POL-048-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 13,
+      "rerank_score": 0.9998471736907959,
+      "rrf_score": 0.0224009900990099
+    },
+    {
+      "chunk_id": "POL-048-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 14,
+      "rerank_score": 0.9998471736907959,
+      "rrf_score": 0.02185211433971179
+    },
+    {
+      "chunk_id": "POL-123-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 15,
+      "rerank_score": 0.9998453855514526,
+      "rrf_score": 0.019535324798482693
+    },
+    {
+      "chunk_id": "POL-123-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 16,
+      "rerank_score": 0.9998453855514526,
+      "rrf_score": 0.018637309292649097
+    },
+    {
+      "chunk_id": "POL-008-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 17,
+      "rerank_score": 0.9998409748077393,
+      "rrf_score": 0.030117753623188408
+    },
+    {
+      "chunk_id": "POL-008-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 18,
+      "rerank_score": 0.9998409748077393,
+      "rrf_score": 0.02877846790890269
+    },
+    {
+      "chunk_id": "POL-033-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 19,
+      "rerank_score": 0.9998396635055542,
+      "rrf_score": 0.023676099747828524
+    },
+    {
+      "chunk_id": "POL-033-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 20,
+      "rerank_score": 0.9998396635055542,
+      "rrf_score": 0.022657450076804916
+    },
+    {
+      "chunk_id": "POL-118-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 21,
+      "rerank_score": 0.9998394250869751,
+      "rrf_score": 0.019174311926605507
+    },
+    {
+      "chunk_id": "POL-118-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 22,
+      "rerank_score": 0.9998394250869751,
+      "rrf_score": 0.018614718614718615
+    },
+    {
+      "chunk_id": "POL-043-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 23,
+      "rerank_score": 0.999839186668396,
+      "rrf_score": 0.02736726874657909
+    },
+    {
+      "chunk_id": "POL-043-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 24,
+      "rerank_score": 0.999839186668396,
+      "rrf_score": 0.026515151515151516
+    },
+    {
+      "chunk_id": "POL-103-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 25,
+      "rerank_score": 0.9998389482498169,
+      "rrf_score": 0.02487789987789988
+    },
+    {
+      "chunk_id": "POL-103-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 26,
+      "rerank_score": 0.9998389482498169,
+      "rrf_score": 0.02402745995423341
+    },
+    {
+      "chunk_id": "POL-078-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 27,
+      "rerank_score": 0.9998316764831543,
+      "rrf_score": 0.027984344422700584
+    },
+    {
+      "chunk_id": "POL-078-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 28,
+      "rerank_score": 0.9998316764831543,
+      "rrf_score": 0.02684684684684685
+    },
+    {
+      "chunk_id": "POL-038-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 29,
+      "rerank_score": 0.9998314380645752,
+      "rrf_score": 0.021568627450980392
+    },
+    {
+      "chunk_id": "POL-038-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 30,
+      "rerank_score": 0.9998314380645752,
+      "rrf_score": 0.020887166236003445
+    },
+    {
+      "chunk_id": "POL-023-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 31,
+      "rerank_score": 0.9998251795768738,
+      "rrf_score": 0.027271052146674038
+    },
+    {
+      "chunk_id": "POL-023-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 32,
+      "rerank_score": 0.9998251795768738,
+      "rrf_score": 0.025708635464733027
+    },
+    {
+      "chunk_id": "POL-073-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 33,
+      "rerank_score": 0.9998249411582947,
+      "rrf_score": 0.022073984232868403
+    },
+    {
+      "chunk_id": "POL-073-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 34,
+      "rerank_score": 0.9998249411582947,
+      "rrf_score": 0.021315192743764172
+    },
+    {
+      "chunk_id": "POL-013-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 35,
+      "rerank_score": 0.9998213648796082,
+      "rrf_score": 0.027108970929195647
+    },
+    {
+      "chunk_id": "POL-013-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 36,
+      "rerank_score": 0.9998213648796082,
+      "rrf_score": 0.02582908163265306
+    },
+    {
+      "chunk_id": "POL-083-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 37,
+      "rerank_score": 0.9998192191123962,
+      "rrf_score": 0.024451318309029312
+    },
+    {
+      "chunk_id": "POL-083-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 38,
+      "rerank_score": 0.9998192191123962,
+      "rrf_score": 0.02362531085935341
+    },
+    {
+      "chunk_id": "POL-113-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 39,
+      "rerank_score": 0.9998020529747009,
+      "rrf_score": 0.018950567623133997
+    },
+    {
+      "chunk_id": "POL-113-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 40,
+      "rerank_score": 0.9998020529747009,
+      "rrf_score": 0.018672919923571306
+    },
+    {
+      "chunk_id": "POL-088-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 41,
+      "rerank_score": 0.9997979998588562,
+      "rrf_score": 0.021595262974573322
+    },
+    {
+      "chunk_id": "POL-088-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 42,
+      "rerank_score": 0.9997979998588562,
+      "rrf_score": 0.020638297872340425
+    },
+    {
+      "chunk_id": "POL-108-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 43,
+      "rerank_score": 0.9997956156730652,
+      "rrf_score": 0.01976246105919003
+    },
+    {
+      "chunk_id": "POL-108-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 44,
+      "rerank_score": 0.9997956156730652,
+      "rrf_score": 0.018874643874643875
+    },
+    {
+      "chunk_id": "POL-058-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 45,
+      "rerank_score": 0.9997783303260803,
+      "rrf_score": 0.022224966045190767
+    },
+    {
+      "chunk_id": "POL-058-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 46,
+      "rerank_score": 0.9997783303260803,
+      "rrf_score": 0.021420389461626575
+    },
+    {
+      "chunk_id": "POL-098-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 47,
+      "rerank_score": 0.9997766613960266,
+      "rrf_score": 0.017980970811159493
+    },
+    {
+      "chunk_id": "POL-098-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 48,
+      "rerank_score": 0.9997766613960266,
+      "rrf_score": 0.017648888197791944
+    },
+    {
+      "chunk_id": "POL-093-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 49,
+      "rerank_score": 0.9997745156288147,
+      "rrf_score": 0.021869488536155203
+    },
+    {
+      "chunk_id": "POL-093-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 50,
+      "rerank_score": 0.9997745156288147,
+      "rrf_score": 0.021338724168912845
+    },
+    {
+      "chunk_id": "POL-066-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 51,
+      "rerank_score": 0.9992285966873169,
+      "rrf_score": 0.024393624393624393
+    },
+    {
+      "chunk_id": "POL-066-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 52,
+      "rerank_score": 0.9992285966873169,
+      "rrf_score": 0.02408008658008658
+    },
+    {
+      "chunk_id": "POL-067-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 53,
+      "rerank_score": 0.9991888403892517,
+      "rrf_score": 0.021666666666666667
+    },
+    {
+      "chunk_id": "POL-067-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 54,
+      "rerank_score": 0.9991888403892517,
+      "rrf_score": 0.021354616048317517
+    },
+    {
+      "chunk_id": "POL-061-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 55,
+      "rerank_score": 0.9989960789680481,
+      "rrf_score": 0.008849557522123894
+    },
+    {
+      "chunk_id": "POL-061-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 56,
+      "rerank_score": 0.9989960789680481,
+      "rrf_score": 0.008620689655172414
+    },
+    {
+      "chunk_id": "POL-070-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 57,
+      "rerank_score": 0.9989721775054932,
+      "rrf_score": 0.02222464320732106
+    },
+    {
+      "chunk_id": "POL-070-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 58,
+      "rerank_score": 0.9989721775054932,
+      "rrf_score": 0.02165032679738562
+    },
+    {
+      "chunk_id": "POL-006-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 59,
+      "rerank_score": 0.9989620447158813,
+      "rrf_score": 0.01599337326366764
+    },
+    {
+      "chunk_id": "POL-006-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 60,
+      "rerank_score": 0.9989620447158813,
+      "rrf_score": 0.015527202696196438
+    },
+    {
+      "chunk_id": "POL-041-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 61,
+      "rerank_score": 0.9989514350891113,
+      "rrf_score": 0.008695652173913044
+    },
+    {
+      "chunk_id": "POL-041-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 62,
+      "rerank_score": 0.9989514350891113,
+      "rrf_score": 0.008130081300813009
+    },
+    {
+      "chunk_id": "POL-026-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 63,
+      "rerank_score": 0.9989405274391174,
+      "rrf_score": 0.016523867809057527
+    },
+    {
+      "chunk_id": "POL-026-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 64,
+      "rerank_score": 0.9989405274391174,
+      "rrf_score": 0.01595677050222505
+    },
+    {
+      "chunk_id": "POL-076-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 65,
+      "rerank_score": 0.9989051818847656,
+      "rrf_score": 0.014844136566056407
+    },
+    {
+      "chunk_id": "POL-076-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 66,
+      "rerank_score": 0.9989051818847656,
+      "rrf_score": 0.01444966092853417
+    },
+    {
+      "chunk_id": "POL-062-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 67,
+      "rerank_score": 0.9988781809806824,
+      "rrf_score": 0.007874015748031496
+    },
+    {
+      "chunk_id": "POL-062-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 68,
+      "rerank_score": 0.9988781809806824,
+      "rrf_score": 0.007575757575757576
+    },
+    {
+      "chunk_id": "POL-021-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 69,
+      "rerank_score": 0.9988669157028198,
+      "rrf_score": 0.014836316723109177
+    },
+    {
+      "chunk_id": "POL-021-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 70,
+      "rerank_score": 0.9988669157028198,
+      "rrf_score": 0.01425
+    },
+    {
+      "chunk_id": "POL-101-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 71,
+      "rerank_score": 0.9988516569137573,
+      "rrf_score": 0.0078125
+    },
+    {
+      "chunk_id": "POL-101-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 72,
+      "rerank_score": 0.9988516569137573,
+      "rrf_score": 0.007518796992481203
+    },
+    {
+      "chunk_id": "POL-007-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 73,
+      "rerank_score": 0.9988338351249695,
+      "rrf_score": 0.01418725159732354
+    },
+    {
+      "chunk_id": "POL-007-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 74,
+      "rerank_score": 0.9988338351249695,
+      "rrf_score": 0.013437950937950938
+    },
+    {
+      "chunk_id": "POL-027-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 75,
+      "rerank_score": 0.9988314509391785,
+      "rrf_score": 0.015040995193666949
+    },
+    {
+      "chunk_id": "POL-027-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 76,
+      "rerank_score": 0.9988314509391785,
+      "rrf_score": 0.014345948169477582
+    },
+    {
+      "chunk_id": "POL-042-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 77,
+      "rerank_score": 0.9988251328468323,
+      "rrf_score": 0.007692307692307693
+    },
+    {
+      "chunk_id": "POL-011-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 78,
+      "rerank_score": 0.9988116025924683,
+      "rrf_score": 0.014716075713143161
+    },
+    {
+      "chunk_id": "POL-011-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 79,
+      "rerank_score": 0.9988116025924683,
+      "rrf_score": 0.00819672131147541
+    },
+    {
+      "chunk_id": "POL-081-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 80,
+      "rerank_score": 0.9987336993217468,
+      "rrf_score": 0.008403361344537815
+    },
+    {
+      "chunk_id": "POL-081-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 81,
+      "rerank_score": 0.9987336993217468,
+      "rrf_score": 0.007936507936507936
+    },
+    {
+      "chunk_id": "POL-022-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 82,
+      "rerank_score": 0.9987302422523499,
+      "rrf_score": 0.007352941176470588
+    },
+    {
+      "chunk_id": "POL-091-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 83,
+      "rerank_score": 0.9987040758132935,
+      "rrf_score": 0.007246376811594203
+    },
+    {
+      "chunk_id": "POL-102-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 84,
+      "rerank_score": 0.998699426651001,
+      "rrf_score": 0.007462686567164179
+    },
+    {
+      "chunk_id": "POL-012-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 85,
+      "rerank_score": 0.9986751675605774,
+      "rrf_score": 0.008130081300813009
+    },
+    {
+      "chunk_id": "POL-012-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 86,
+      "rerank_score": 0.9986751675605774,
+      "rrf_score": 0.008064516129032258
+    },
+    {
+      "chunk_id": "POL-010-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 87,
+      "rerank_score": 0.9986201524734497,
+      "rrf_score": 0.007633587786259542
+    },
+    {
+      "chunk_id": "POL-010-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 88,
+      "rerank_score": 0.9986201524734497,
+      "rrf_score": 0.007575757575757576
+    },
+    {
+      "chunk_id": "POL-080-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 89,
+      "rerank_score": 0.9985879063606262,
+      "rrf_score": 0.007194244604316547
+    },
+    {
+      "chunk_id": "POL-080-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 90,
+      "rerank_score": 0.9985879063606262,
+      "rrf_score": 0.007142857142857143
+    },
+    {
+      "chunk_id": "POL-030-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 91,
+      "rerank_score": 0.9985839128494263,
+      "rrf_score": 0.007874015748031496
+    },
+    {
+      "chunk_id": "POL-030-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 92,
+      "rerank_score": 0.9985839128494263,
+      "rrf_score": 0.0078125
+    },
+    {
+      "chunk_id": "POL-015-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 93,
+      "rerank_score": 0.9981743097305298,
+      "rrf_score": 0.008403361344537815
+    },
+    {
+      "chunk_id": "POL-015-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 94,
+      "rerank_score": 0.9981743097305298,
+      "rrf_score": 0.008333333333333333
+    },
+    {
+      "chunk_id": "POL-069-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 95,
+      "rerank_score": 0.9980329871177673,
+      "rrf_score": 0.012987012987012988
+    },
+    {
+      "chunk_id": "POL-069-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 96,
+      "rerank_score": 0.9980329871177673,
+      "rrf_score": 0.01282051282051282
+    },
+    {
+      "chunk_id": "POL-029-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 97,
+      "rerank_score": 0.997413694858551,
+      "rrf_score": 0.0072992700729927005
+    },
+    {
+      "chunk_id": "POL-029-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 98,
+      "rerank_score": 0.997413694858551,
+      "rrf_score": 0.007246376811594203
+    },
+    {
+      "chunk_id": "POL-014-V1-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 99,
+      "rerank_score": 0.9964379072189331,
+      "rrf_score": 0.008
+    },
+    {
+      "chunk_id": "POL-014-V2-C04",
+      "in_final_top_k": false,
+      "is_gold": false,
+      "rerank_rank": 100,
+      "rerank_score": 0.9964379072189331,
+      "rrf_score": 0.007936507936507936
+    }
+  ],
+  "documents_that_beat_gold": [
+    "POL-053-V1-C04",
+    "POL-053-V2-C04",
+    "POL-028-V1-C04",
+    "POL-028-V2-C04",
+    "POL-003-V1-C04",
+    "POL-003-V2-C04",
+    "POL-068-V1-C04"
+  ],
+  "expected_answer": "属于；第 15 个自然日当日包含在窗口内，超过期限才需要人工例外审批。",
+  "gold_chunk_ids": [
+    "POL-068-V2-C04"
+  ],
+  "gold_missing_from_final_top_k": true,
+  "gold_rerank_rank": 8,
+  "k": 5,
+  "lexical_context": [
+    {
+      "chunk_id": "POL-053-V1-C04",
+      "rerank_score": 0.9998589754104614,
+      "similarity_to_gold": 0.9468,
+      "text": "退款申请边界。本条适用于家居生活范围内的重复订单处理业务。常规退货申请须在签收后 15 个自然日内提交，第 15 日当日仍在受理窗口内；超过该日须进入人工例外审批，不得按常规窗口自动受理。",
+      "text_identical_to_gold": false,
+      "version": "V1"
+    },
+    {
+      "chunk_id": "POL-053-V2-C04",
+      "rerank_score": 0.9998589754104614,
+      "similarity_to_gold": 0.9468,
+      "text": "退款申请边界。本条适用于家居生活范围内的重复订单处理业务。常规退货申请须在签收后 15 个自然日内提交，第 15 日当日仍在受理窗口内；超过该日须进入人工例外审批，不得按常规窗口自动受理。",
+      "text_identical_to_gold": false,
+      "version": "V2"
+    },
+    {
+      "chunk_id": "POL-028-V1-C04",
+      "rerank_score": 0.9998528957366943,
+      "similarity_to_gold": 0.9462,
+      "text": "退款申请边界。本条适用于家居生活范围内的商家结算业务。常规退货申请须在签收后 15 个自然日内提交，第 15 日当日仍在受理窗口内；超过该日须进入人工例外审批，不得按常规窗口自动受理。",
+      "text_identical_to_gold": false,
+      "version": "V1"
+    },
+    {
+      "chunk_id": "POL-028-V2-C04",
+      "rerank_score": 0.9998528957366943,
+      "similarity_to_gold": 0.9462,
+      "text": "退款申请边界。本条适用于家居生活范围内的商家结算业务。常规退货申请须在签收后 15 个自然日内提交，第 15 日当日仍在受理窗口内；超过该日须进入人工例外审批，不得按常规窗口自动受理。",
+      "text_identical_to_gold": false,
+      "version": "V2"
+    },
+    {
+      "chunk_id": "POL-003-V1-C04",
+      "rerank_score": 0.9998505115509033,
+      "similarity_to_gold": 0.9368,
+      "text": "退款申请边界。本条适用于家居生活范围内的订单生命周期管理业务。常规退货申请须在签收后 15 个自然日内提交，第 15 日当日仍在受理窗口内；超过该日须进入人工例外审批，不得按常规窗口自动受理。",
+      "text_identical_to_gold": false,
+      "version": "V1"
+    },
+    {
+      "chunk_id": "POL-003-V2-C04",
+      "rerank_score": 0.9998505115509033,
+      "similarity_to_gold": 0.9368,
+      "text": "退款申请边界。本条适用于家居生活范围内的订单生命周期管理业务。常规退货申请须在签收后 15 个自然日内提交，第 15 日当日仍在受理窗口内；超过该日须进入人工例外审批，不得按常规窗口自动受理。",
+      "text_identical_to_gold": false,
+      "version": "V2"
+    }
+  ],
+  "query": "退货受理时限/家居生活的退货申请在签收后的第 15 个自然日提交，仍属于常规受理窗口吗？",
+  "rerank_window": 100,
+  "reranker": "BAAI/bge-reranker-base",
+  "reranker_backend": "sentence_transformers_cross_encoder",
+  "rrf_head": [
+    {
+      "chunk_id": "POL-068-V1-C04",
+      "is_gold": false,
+      "rrf_rank": 1
+    },
+    {
+      "chunk_id": "POL-068-V2-C04",
+      "is_gold": true,
+      "rrf_rank": 2
+    },
+    {
+      "chunk_id": "POL-008-V1-C04",
+      "is_gold": false,
+      "rrf_rank": 3
+    },
+    {
+      "chunk_id": "POL-008-V2-C04",
+      "is_gold": false,
+      "rrf_rank": 4
+    },
+    {
+      "chunk_id": "POL-028-V1-C04",
+      "is_gold": false,
+      "rrf_rank": 5
+    },
+    {
+      "chunk_id": "POL-078-V1-C04",
+      "is_gold": false,
+      "rrf_rank": 6
+    },
+    {
+      "chunk_id": "POL-043-V1-C04",
+      "is_gold": false,
+      "rrf_rank": 7
+    },
+    {
+      "chunk_id": "POL-023-V1-C04",
+      "is_gold": false,
+      "rrf_rank": 8
+    }
+  ],
+  "split": "holdout",
+  "target_question": "EVAL-116",
+  "trap_type": "boundary_exception",
+  "winners_missing_from_k": null
+}

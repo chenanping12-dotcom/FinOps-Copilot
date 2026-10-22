@@ -1,0 +1,51 @@
+{
+  "arms": {
+    "bm25": "纯 BM25（词法）",
+    "dense": "纯向量（BGE 双塔）",
+    "hybrid_rerank": "Hybrid + Rerank（BM25+Dense→RRF→CrossEncoder）"
+  },
+  "avg_latency_ms": {
+    "bm25": 13.633527499988912,
+    "dense": 20.511999166653066,
+    "hybrid_rerank": 6564.1992433333
+  },
+  "bad_case_count": 0,
+  "bad_cases": [],
+  "corpus_chunks": 5000,
+  "embedder_backend": "sentence_transformers",
+  "embedder_model": "BAAI/bge-small-zh-v1.5",
+  "generated_at": "2026-10-21T13:07:27.255281+00:00",
+  "is_full_evaluation_set": true,
+  "k": 5,
+  "limit": null,
+  "metrics": {
+    "bm25": {
+      "answerable_questions": 90,
+      "excluded_unanswerable": 30,
+      "mrr_at_5": 0.5,
+      "recall_at_5": 1.0,
+      "unanswerable_questions": 30
+    },
+    "dense": {
+      "answerable_questions": 90,
+      "excluded_unanswerable": 30,
+      "mrr_at_5": 0.46462962962962967,
+      "recall_at_5": 0.9666666666666667,
+      "unanswerable_questions": 30
+    },
+    "hybrid_rerank": {
+      "answerable_questions": 90,
+      "excluded_unanswerable": 30,
+      "mrr_at_5": 0.6105555555555556,
+      "recall_at_5": 0.9888888888888889,
+      "unanswerable_questions": 30
+    }
+  },
+  "note": "Synthetic-corpus offline evaluation. Retrieval metrics only; they are not end-to-end answer accuracy and not production performance.",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.13.3",
+  "questions_evaluated": 120,
+  "real_model_run": true,
+  "reranker_backend": "sentence_transformers_cross_encoder",
+  "reranker_model": "BAAI/bge-reranker-base"
+}

@@ -1,0 +1,141 @@
+{
+  "hybrid_fixed": [],
+  "rerank_promoted_gold": [
+    {
+      "bm25_gold_rank": 2,
+      "dense_gold_rank": 3,
+      "expected_answer": "仅状态为 completed、shipped 的订单计入营收；以当前生效的 V2 条款为准。",
+      "gold_chunk_ids": [
+        "POL-013-V2-C01"
+      ],
+      "gold_citation": "[POL-013-V2, Page 1, Line 10]",
+      "gold_text": "营收纳入状态。本条适用于家居生活范围内的退款核算业务。当前版本仅将状态为 completed、shipped 的订单纳入营收统计；其他状态不因已创建或已支付而自动计入。",
+      "gold_version": "V2",
+      "hybrid_gold_rank": 1,
+      "query": "当前生效口径下，退款核算/家居生活中哪些订单状态可以计入营收？",
+      "question_id": "EVAL-001",
+      "rrf_gold_rank": null,
+      "split": "development",
+      "trap_type": "version_conflict"
+    },
+    {
+      "bm25_gold_rank": 2,
+      "dense_gold_rank": 2,
+      "expected_answer": "仅状态为 completed、shipped 的订单计入营收；以当前生效的 V2 条款为准。",
+      "gold_chunk_ids": [
+        "POL-110-V2-C01"
+      ],
+      "gold_citation": "[POL-110-V2, Page 1, Line 10]",
+      "gold_text": "营收纳入状态。本条适用于美妆个护范围内的税务凭证管理业务。当前版本仅将状态为 completed、shipped 的订单纳入营收统计；其他状态不因已创建或已支付而自动计入。",
+      "gold_version": "V2",
+      "hybrid_gold_rank": 1,
+      "query": "当前生效口径下，税务凭证管理/美妆个护中哪些订单状态可以计入营收？",
+      "question_id": "EVAL-005",
+      "rrf_gold_rank": null,
+      "split": "development",
+      "trap_type": "version_conflict"
+    },
+    {
+      "bm25_gold_rank": 2,
+      "dense_gold_rank": 2,
+      "expected_answer": "仅状态为 completed、shipped 的订单计入营收；以当前生效的 V2 条款为准。",
+      "gold_chunk_ids": [
+        "POL-086-V2-C01"
+      ],
+      "gold_citation": "[POL-086-V2, Page 1, Line 10]",
+      "gold_text": "营收纳入状态。本条适用于全品类范围内的促销叠加规则业务。当前版本仅将状态为 completed、shipped 的订单纳入营收统计；其他状态不因已创建或已支付而自动计入。",
+      "gold_version": "V2",
+      "hybrid_gold_rank": 1,
+      "query": "当前生效口径下，促销叠加规则/全品类中哪些订单状态可以计入营收？",
+      "question_id": "EVAL-009",
+      "rrf_gold_rank": null,
+      "split": "development",
+      "trap_type": "version_conflict"
+    },
+    {
+      "bm25_gold_rank": 2,
+      "dense_gold_rank": 2,
+      "expected_answer": "仅状态为 completed、shipped 的订单计入营收；以当前生效的 V2 条款为准。",
+      "gold_chunk_ids": [
+        "POL-106-V2-C01"
+      ],
+      "gold_citation": "[POL-106-V2, Page 1, Line 10]",
+      "gold_text": "营收纳入状态。本条适用于全品类范围内的税务凭证管理业务。当前版本仅将状态为 completed、shipped 的订单纳入营收统计；其他状态不因已创建或已支付而自动计入。",
+      "gold_version": "V2",
+      "hybrid_gold_rank": 1,
+      "query": "当前生效口径下，税务凭证管理/全品类中哪些订单状态可以计入营收？",
+      "question_id": "EVAL-013",
+      "rrf_gold_rank": null,
+      "split": "development",
+      "trap_type": "version_conflict"
+    },
+    {
+      "bm25_gold_rank": 2,
+      "dense_gold_rank": 2,
+      "expected_answer": "仅状态为 completed、shipped 的订单计入营收；以当前生效的 V2 条款为准。",
+      "gold_chunk_ids": [
+        "POL-108-V2-C01"
+      ],
+      "gold_citation": "[POL-108-V2, Page 1, Line 10]",
+      "gold_text": "营收纳入状态。本条适用于家居生活范围内的税务凭证管理业务。当前版本仅将状态为 completed、shipped 的订单纳入营收统计；其他状态不因已创建或已支付而自动计入。",
+      "gold_version": "V2",
+      "hybrid_gold_rank": 1,
+      "query": "当前生效口径下，税务凭证管理/家居生活中哪些订单状态可以计入营收？",
+      "question_id": "EVAL-025",
+      "rrf_gold_rank": null,
+      "split": "development",
+      "trap_type": "version_conflict"
+    },
+    {
+      "bm25_gold_rank": 2,
+      "dense_gold_rank": 2,
+      "expected_answer": "仅状态为 completed、shipped 的订单计入营收；以当前生效的 V2 条款为准。",
+      "gold_chunk_ids": [
+        "POL-080-V2-C01"
+      ],
+      "gold_citation": "[POL-080-V2, Page 1, Line 10]",
+      "gold_text": "营收纳入状态。本条适用于美妆个护范围内的拒付处理业务。当前版本仅将状态为 completed、shipped 的订单纳入营收统计；其他状态不因已创建或已支付而自动计入。",
+      "gold_version": "V2",
+      "hybrid_gold_rank": 1,
+      "query": "当前生效口径下，拒付处理/美妆个护中哪些订单状态可以计入营收？",
+      "question_id": "EVAL-029",
+      "rrf_gold_rank": null,
+      "split": "development",
+      "trap_type": "version_conflict"
+    },
+    {
+      "bm25_gold_rank": 2,
+      "dense_gold_rank": 2,
+      "expected_answer": "仅状态为 completed、shipped 的订单计入营收；以当前生效的 V2 条款为准。",
+      "gold_chunk_ids": [
+        "POL-087-V2-C01"
+      ],
+      "gold_citation": "[POL-087-V2, Page 1, Line 10]",
+      "gold_text": "营收纳入状态。本条适用于数码电子范围内的促销叠加规则业务。当前版本仅将状态为 completed、shipped 的订单纳入营收统计；其他状态不因已创建或已支付而自动计入。",
+      "gold_version": "V2",
+      "hybrid_gold_rank": 1,
+      "query": "当前生效口径下，促销叠加规则/数码电子中哪些订单状态可以计入营收？",
+      "question_id": "EVAL-037",
+      "rrf_gold_rank": null,
+      "split": "development",
+      "trap_type": "version_conflict"
+    },
+    {
+      "bm25_gold_rank": 2,
+      "dense_gold_rank": 2,
+      "expected_answer": "仅状态为 completed、shipped 的订单计入营收；以当前生效的 V2 条款为准。",
+      "gold_chunk_ids": [
+        "POL-082-V2-C01"
+      ],
+      "gold_citation": "[POL-082-V2, Page 1, Line 10]",
+      "gold_text": "营收纳入状态。本条适用于数码电子范围内的商家费用核算业务。当前版本仅将状态为 completed、shipped 的订单纳入营收统计；其他状态不因已创建或已支付而自动计入。",
+      "gold_version": "V2",
+      "hybrid_gold_rank": 1,
+      "query": "当前生效口径下，商家费用核算/数码电子中哪些订单状态可以计入营收？",
+      "question_id": "EVAL-041",
+      "rrf_gold_rank": null,
+      "split": "development",
+      "trap_type": "version_conflict"
+    }
+  ]
+}

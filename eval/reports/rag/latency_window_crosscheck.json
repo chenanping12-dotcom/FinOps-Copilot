@@ -1,0 +1,46 @@
+{
+  "purpose": "reconcile ablation.json hybrid latency vs window_diagnosis.json sweep",
+  "answerable_questions": 90,
+  "results": [
+    {
+      "window": 20,
+      "n": 90,
+      "mean_ms": 723.8,
+      "median_ms": 748.4,
+      "p90_ms": 782.9,
+      "first10_mean_ms": 725.3,
+      "last10_mean_ms": 721.3,
+      "pass": "pass-A"
+    },
+    {
+      "window": 100,
+      "n": 90,
+      "mean_ms": 3449.5,
+      "median_ms": 3570.9,
+      "p90_ms": 3712.6,
+      "first10_mean_ms": 3410.1,
+      "last10_mean_ms": 3473.1,
+      "pass": "pass-A"
+    },
+    {
+      "window": 100,
+      "n": 90,
+      "mean_ms": 3451.4,
+      "median_ms": 3516.6,
+      "p90_ms": 3675.4,
+      "first10_mean_ms": 3399.9,
+      "last10_mean_ms": 3337.1,
+      "pass": "pass-B"
+    },
+    {
+      "window": 20,
+      "n": 90,
+      "mean_ms": 705.8,
+      "median_ms": 729.8,
+      "p90_ms": 762.8,
+      "first10_mean_ms": 714.3,
+      "last10_mean_ms": 702.0,
+      "pass": "pass-B"
+    }
+  ]
+}

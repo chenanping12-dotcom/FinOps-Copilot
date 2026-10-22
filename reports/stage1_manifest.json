@@ -1,0 +1,1055 @@
+{
+  "artifacts": [
+    {
+      "path": "data/generated/orders/anomaly_labels.jsonl",
+      "sha256": "a9de077bff6fa3dd0ef827d3ac769bbc11f452bdd871d839344f0bb967e29f27"
+    },
+    {
+      "path": "data/generated/orders/orders.csv",
+      "sha256": "41d9a54d585092931941544b91b2d8420b1a95887ef79743f9bc0830e9c76a23"
+    },
+    {
+      "path": "data/generated/rule_docs/chunks.jsonl",
+      "sha256": "765a792ec6f1e2b448e885928f605d835a46d880913099814e53546567f6b966"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-001-V1.md",
+      "sha256": "1d7c13301b3c003d4062d41ec9285239a15a33ac0dc89005cab5c159fe09d7eb"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-001-V2.md",
+      "sha256": "5e61eb3660a785fa83f30a9a61d627613d2049e343a7338c82669f0a0e04a43f"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-002-V1.md",
+      "sha256": "b50734cbb2fcf782f6221c1cf75e03e5ce347ab64042f25aa3892ee580e68490"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-002-V2.md",
+      "sha256": "2430dfcb0b971d6aed993212f5c469aaf8f5e2e53400787a02124419ec283bfa"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-003-V1.md",
+      "sha256": "11caa26747abfee334280b94a05bb9cdc6336ee952aeb9e0878ee528f377f302"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-003-V2.md",
+      "sha256": "3b364c575ca3b3d270dce41e0269530144a2d5bc8e2ac8a1266ee96d15ed16ec"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-004-V1.md",
+      "sha256": "b23e4a19f38e8e99073b43fbe1b4c7634d126af9100dbb146da538de3a0606ba"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-004-V2.md",
+      "sha256": "08d2676ef5fede7c139fbc6384428de5fca5913f04555485453dfd10c62a1d13"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-005-V1.md",
+      "sha256": "aa56c9bf7223cab4063c056abfb2103c1cc2b51e0100fb76369631ceab69b0e5"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-005-V2.md",
+      "sha256": "ba9d520ca77a63d19c50118e0033b4bfdf52313d331094599f0f2ff957f50093"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-006-V1.md",
+      "sha256": "c93e6b7bff2fc8be3cc43a47e314fd35dad900e422ebf90117733c4349dd8d82"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-006-V2.md",
+      "sha256": "ced64e9e27ca0c95ff1801f7a76ffbbbd0dfa0fc1ce1982eb20c951ddb512817"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-007-V1.md",
+      "sha256": "867f6f32aa1ac23ad511a006ae8bd70624cc779b45211479154c199953c9c820"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-007-V2.md",
+      "sha256": "2cf2c4450e03aa7e97b8bf5ee57cc391f669d7b7ff0093fa772ebc4cce0d8927"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-008-V1.md",
+      "sha256": "910beb38b98e54f9b057b7e99aa54ef3ac9cc7b79358a2eee947152aad5dc88a"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-008-V2.md",
+      "sha256": "9db16eeb8ae8e2b186cf9cd266b2c3cae1e5c80a9cfc83306f2d19a0571d23e5"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-009-V1.md",
+      "sha256": "a586c5014b43cc14ba78358390365a1e86088485ab6f3df13bd9f701d4d592ed"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-009-V2.md",
+      "sha256": "254d1f5a25bd9787d97083846c484c46a1b656a3a6e52d8e6a4ed350203b9b4a"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-010-V1.md",
+      "sha256": "6768fc261092149917f3e02f120e75f554b2d01c31794289bd8f126680c9ad33"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-010-V2.md",
+      "sha256": "5f6601e413b036aae194cf7d133e5155a99c77fc1aefc79a7ce232c81a92c045"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-011-V1.md",
+      "sha256": "e28df6b1694d90a0104e2bb0b657ee6d841b78ba18d2d3c3f1b56db7b017d809"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-011-V2.md",
+      "sha256": "bffc1828cc017532ee8b6e4c254bebef801e55a13cbbbba64a87e7ceee109867"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-012-V1.md",
+      "sha256": "1423c4971a64ae0a3a0c785881a921e421d0ca6e60cbcbf493a4272ffc8ec92d"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-012-V2.md",
+      "sha256": "8ed5d771534a1da9b50f623123f8e31ca4f66174905f616626551c847baee0f4"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-013-V1.md",
+      "sha256": "15fd183943bb060f5eeab287ffb8370990191d8753f916b31420b6e316be9cb0"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-013-V2.md",
+      "sha256": "8b0cf46ffe1413ae39b2be072612dc1fdfa0e36a8e4fd41a0da35be9e54449d2"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-014-V1.md",
+      "sha256": "711af692947b7517810fd7ee43da9376f029535371f7734977011336853ebcee"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-014-V2.md",
+      "sha256": "5bf4a6419e3aba501ef6fc79d53b32df96919c47253ae75c9acf097432ae077a"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-015-V1.md",
+      "sha256": "8267bda3f40f7e2a35598154c6f626f3f3583ac3321d25ded85fe7d5d265fe1d"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-015-V2.md",
+      "sha256": "6d383969dc515924d2f992be30558f53d68249c0d293e9839d5e9bd1199259e6"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-016-V1.md",
+      "sha256": "880f4f1ea2536ea80c9bf896e6ca6717a692185eb0245c7fcd912557af59b122"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-016-V2.md",
+      "sha256": "2a7a0f26e9a0d15d947309e8736a65539f8cd5583ef4a3591866221758a27844"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-017-V1.md",
+      "sha256": "22bae6334b3b42964ecc35bde836f99646e78e759437df83bcda05b43b8b00f4"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-017-V2.md",
+      "sha256": "b6a0d9d9304e9a0fc11de2af7aed3a483822b9b0a8fdec121186d0523a86aae4"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-018-V1.md",
+      "sha256": "250385d070f30e4cf1c2325370ccd4a4b1013f1f8a7d2d625aaf553e8d333136"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-018-V2.md",
+      "sha256": "9bf8eefb9db7456bfbb1ff33ee65a0d19471b496b4850a0f8e94c47f4b2d297e"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-019-V1.md",
+      "sha256": "ea756bd03b8fea00e2d1130b490c16797a85d07436ecad44b1dbeec04859a1dc"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-019-V2.md",
+      "sha256": "970f2f321ab18d5961a81b71880722a7a01c5d8fa8dbaab10eb7ab3d73214f3e"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-020-V1.md",
+      "sha256": "f45620aae3421abdd38d66a146c449d87eef05518e61b934a2592a83c48f70a9"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-020-V2.md",
+      "sha256": "41dc53d109dd70d8259326a920538da33e163754a0a322cebec6083f3388fdea"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-021-V1.md",
+      "sha256": "43f1946d5421c1c10cf03ca7f6a71b7dfaacee0b5ce33785d14460467828974f"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-021-V2.md",
+      "sha256": "4eeb42d133a5681c67f7ab161186202d3443e3a3ab812c94c45dbb992783d27b"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-022-V1.md",
+      "sha256": "2b6cf1a698ee9327bbb770f1ecb1dc2623716c68e951f1e61fb7c98e419ea3a2"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-022-V2.md",
+      "sha256": "6214a2d65cfaeb3228edca8ad23b5d288b3ff35dec042184f58b752b87a2fb02"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-023-V1.md",
+      "sha256": "4669a8bf6af67bc63f41e16f312e43c2ce3c8556e0830e28f5492437ae24ae42"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-023-V2.md",
+      "sha256": "5e361b4bc61fc97a8872555f77b5f9d6b5c40078c251e8833f466631bda37bdd"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-024-V1.md",
+      "sha256": "28bf294aaf9af526c2f631a8b82ac8a06e1b1588cfdef283139cad2619dd68f3"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-024-V2.md",
+      "sha256": "686deb1b691d9ae7ea1a3f206bd67cd91bb96be87f69bf8dc38cb00d1774a10a"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-025-V1.md",
+      "sha256": "602f6af9bb0eed5db0f3154029cb863479fb67bd8d4fa03bcfc738534ffd1cc5"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-025-V2.md",
+      "sha256": "9144e96addd1674ba8e0038de79b52f48f5e1f393c546c03fc2968603874de67"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-026-V1.md",
+      "sha256": "6082b577adcd68d66d309ca0ec2e664f91ec23296a52b8010a8df090515deb06"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-026-V2.md",
+      "sha256": "8b74d0e2490ac35c6dd5e299120eedda5f3c5ffddfec959c8f7e12853984309c"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-027-V1.md",
+      "sha256": "10eeff40768d518f3f0a487f3ff76d1cb3421e29b3bf8269d08ec8f203a3c5dc"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-027-V2.md",
+      "sha256": "a174e3d1f6f3b85324f61456f0405d8d5c51fc2060e8118236c3e8825e66804d"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-028-V1.md",
+      "sha256": "e6109d8e0050a4f1ea216e0eb70e41cc3efad8eed7578fa836e8d0c6328fe984"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-028-V2.md",
+      "sha256": "be52c5a08501a909efbb3a542b860ef2f1cba0369586804496321f3e5130ef87"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-029-V1.md",
+      "sha256": "942ba1c6f1e4611a48d9131066b3bb545075cb08a3a919ff12f58c3a743be70a"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-029-V2.md",
+      "sha256": "50d92d58843c5dee334240dec7a3e1a00f1d49efddc44ce52ee0d69220390b26"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-030-V1.md",
+      "sha256": "1f602ff03de78a86cb2dc29100c047878ccf0fda21dbd57796954eedaee235c8"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-030-V2.md",
+      "sha256": "9aadcba47aa0e3ef75b27f3d31481806644e639096f32c6846cc945e72184580"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-031-V1.md",
+      "sha256": "845fec5cd94bdfde2eda908c246a64cfaf6e91d6fe544d71ab8b8279d107c839"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-031-V2.md",
+      "sha256": "2a27304342cf8eeb1b397a575b7f3bab7ed8d6fe6f3a69e070a255606bed398c"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-032-V1.md",
+      "sha256": "0c61334c075c67e63c7070a0986223441717ca3b7e7fdd81d5ffc72385e1094f"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-032-V2.md",
+      "sha256": "70eb3014ce77b4ed36cbee1a36b718bf411b195892e35041161859827b4ad1a8"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-033-V1.md",
+      "sha256": "ba8673037a223861029bfd6365ce16294562227f3fb69f1f247135f59650d307"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-033-V2.md",
+      "sha256": "cc819a983dd056e6eff7468d84bc317b7a0585b71ab7e0bfe4d8e536af4e565c"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-034-V1.md",
+      "sha256": "5ea8ffa5bc0ae5f2bd16fe4e4d1766240e3a0732f4b0abe358c72437db4e7ed3"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-034-V2.md",
+      "sha256": "6657e0b9e4f55035723c0ff6d54b6d8778cf7969de9466e1415de88a6a89d21b"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-035-V1.md",
+      "sha256": "7699933fb33ed2bb074118ee0a5e42245c970b0a84968952e30140bf6919e9c9"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-035-V2.md",
+      "sha256": "cc8360fdcd65160f6ccf57f8877e5cf241e2938637cd211a7f2b258dfadd083e"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-036-V1.md",
+      "sha256": "38035218ae29b9e0f0b58808e1be449244acd9f58e1b6a84835ced3a209dfd59"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-036-V2.md",
+      "sha256": "a8a9883a4b574b001396858af970469040bea6fca33f1a9666543a287e21baa1"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-037-V1.md",
+      "sha256": "949418a162d0fb7dd12dd0aac5c9c65cda6e6da7ca0a8d03032e9277afa1aaee"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-037-V2.md",
+      "sha256": "3c513a6e41bd147a4d8a36363ce36d2d579e1d15780be13ded9430b6a6b7c886"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-038-V1.md",
+      "sha256": "df7de0e55378b888baff30330473c59bb3ec3bb4e9f61f193f9a3675052a7840"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-038-V2.md",
+      "sha256": "e02a06deb3143719ae22fad6c2e3a059a0899bf8b9b5bd25f5407c06573dfede"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-039-V1.md",
+      "sha256": "6009d37256c6302d0581ea10dfda3f7e1c35b13394e49e13af447974cefc4938"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-039-V2.md",
+      "sha256": "4ee5b6f5b98c4ca87f73ae1380f8b8b5834c635aa291d33368f910e09bb526da"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-040-V1.md",
+      "sha256": "ab2ce20fbc61ea5bc195c5c5746757502d015bc9b6221c146f9df4069f50fb6b"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-040-V2.md",
+      "sha256": "2a01bdc067fe4a399ce4efc71b2bfe7c3ed338a1ff3c1eba9d1e25549e352e58"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-041-V1.md",
+      "sha256": "f80d96dfdadcc11074dc614ecb78d1d5d3803b6a32a400cf88a521e7391e5bce"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-041-V2.md",
+      "sha256": "333fca0998caee38c15a6d791c925c9d290680be15ea3634867e32c2a4b27f75"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-042-V1.md",
+      "sha256": "8b988a0499c79e1696c9e56d6a6ae562e4d168a428399cc5766ac9505fa4d65c"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-042-V2.md",
+      "sha256": "169744fc88039caba8ebaa90e47215d30f0beba7f4a4ff50b559c26d10715043"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-043-V1.md",
+      "sha256": "e65189208e7a8c10802e482031aa74956d9f0632c5827cb889c1cc6f43786d6b"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-043-V2.md",
+      "sha256": "51902c4d5e7563ee1ca4ebd26f23e57d32b0dee171b23963467ef0a2755c33cb"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-044-V1.md",
+      "sha256": "78d1dae71ae9a2b76dcb5bcfab7349cd7782f97ad18fe232adb72cf3938d0985"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-044-V2.md",
+      "sha256": "954324d223e04d1ba7249c44ecc839eeee3fb05443e3c513c93c2d0fdeed11a2"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-045-V1.md",
+      "sha256": "af9f8cac271d9c83d4ddec7c3b97e2cc9f60102b2975497352e8c8aef09ec5a3"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-045-V2.md",
+      "sha256": "e5daf84c37b5406fa543dc0913c89a0e34de9a3baffe698f7bbaaca96b8efc2d"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-046-V1.md",
+      "sha256": "2e2cb025660408c53269a1e2ff4585c65ced5df49a58e01860c9a9821243e2e1"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-046-V2.md",
+      "sha256": "a0b3467e3e70c1df1514236d5616097bd767aefc033088839ed7c7e632da5e63"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-047-V1.md",
+      "sha256": "14b2cde5bd0e5c6452c052d8e379e395273de40bc38d5b8c981cf9fac5125fb2"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-047-V2.md",
+      "sha256": "2f237ade702ec5b874689c76dc38f483dbbe86c5be7b9508879061558c36ad49"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-048-V1.md",
+      "sha256": "8975607bbb29d71389691ec781b1ce8c4635a42354b6074ca58d7caf060181e7"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-048-V2.md",
+      "sha256": "bb5ff3d465a148ae0b7d9d01b43669f102c2cd1bcafa631e2fdfc5757f9343c9"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-049-V1.md",
+      "sha256": "c9e755d182a9c90e712081f3067973d630c4cce8366a02c9316d4efb0f5b03cb"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-049-V2.md",
+      "sha256": "0b37dd39e6e0046c9bfb414091016e2a02720174b24489691f3cdfb2d2c96ab1"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-050-V1.md",
+      "sha256": "22e9c4dc9056868dcffc2d6425334ab4206e9ecb746079e110e6ce0956dbaead"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-050-V2.md",
+      "sha256": "4c8258c3382385a984376c810acfb1aaf64217e416b1b1e793f3cda7c7d52491"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-051-V1.md",
+      "sha256": "a81e4cd00cdf394aeca2fe638df1ffe4ac3f663566ba60761fc3ab806b1796a4"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-051-V2.md",
+      "sha256": "948433926f795c99fb477ddc3abc386cd442b76c5c62ed34343ec65f48e873b4"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-052-V1.md",
+      "sha256": "6c8bd1d4097bbed01ef4d280d8d6c9d43b669c3624a7f2a95b93773e037fad49"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-052-V2.md",
+      "sha256": "722c3aba60c16513dc6fd3d6261d8ae405dbb5dfb74118d8c5dd5e99492b8ab5"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-053-V1.md",
+      "sha256": "553d4a727e6f59dc3f15fcaf03d0635ceb80314028051f0996aaab3561e2dc58"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-053-V2.md",
+      "sha256": "6cef83843f5120c2996b0e9a99e22964566e1dd56e17eefc78618f0d97a76474"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-054-V1.md",
+      "sha256": "13aa388d28c8b47f40dbb96116f5853283a7d84629bd6aaeff6e1f9abb7dfd21"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-054-V2.md",
+      "sha256": "24d9ff1c5041a744720324ba1897cf7f9d016911a2e39cff8079b3914ab596ef"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-055-V1.md",
+      "sha256": "3db99a6816c74b2798a341997e970e38f7935dc116c6c9ffb9ee39b3283e3998"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-055-V2.md",
+      "sha256": "188bfc86b02722ee31874e2c29b864aa997c9d885f4e1314ab688cc551a281f0"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-056-V1.md",
+      "sha256": "07877510130edade8b3c58c6972bcd5f53853f55ed957fd70dd05eb7dca4fb63"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-056-V2.md",
+      "sha256": "bbbee7a6ef224d195646a9fa7a20153756dd3eff3c5e78515c646900bf758c01"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-057-V1.md",
+      "sha256": "f5f43dca3e6ffa1ed6f54127df36ab89a9fcd782df98955950383a899000dd74"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-057-V2.md",
+      "sha256": "59e4392f693a2500d3f1c04dfc8cab5777b1d7690280dd47ba3b8111e2df2707"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-058-V1.md",
+      "sha256": "c9205e150e65deed042baf1592fb8c26e8c143146a6a91c18a7c69efb594a358"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-058-V2.md",
+      "sha256": "a52c46813498d8f908f5242fc49c83dacee924c6f692873f3017a0be658d69bc"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-059-V1.md",
+      "sha256": "2bc0b89bb01c037ffc1138d8828cec1419b688d9cdb5c4fa5e302d96061c6911"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-059-V2.md",
+      "sha256": "14e24420969bbf8dac3f572c1d137013df90d298904dffddeb52f7544b9fe5d1"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-060-V1.md",
+      "sha256": "be824c238f66b5dbe4280e9e64a647830e117c35a846efd26aa175e429e6c0ba"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-060-V2.md",
+      "sha256": "5b222226f95b90111f94d9ac969e9f558ede346ac3434303034f5cba7482c0a5"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-061-V1.md",
+      "sha256": "e7616155b97f10fde3248c9ce6037b786db560bd24629bf1623226055d5ced74"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-061-V2.md",
+      "sha256": "b03eca613edce9880a5df3ecb7f0115dda72e36219dda56df905ffe7af805b2e"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-062-V1.md",
+      "sha256": "e5714ad2941a7abc5bec50a7cae91e573d1f364b5e1613b3d983d4bfe0616fe1"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-062-V2.md",
+      "sha256": "5d7c760c901720710f5ce94bc7c41f4b74f62c7f049df853b7eea608b61379ac"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-063-V1.md",
+      "sha256": "69d4bb6773830a83619c42ddd2045c0132bb95a3d53773e040414f5a745e679f"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-063-V2.md",
+      "sha256": "497dcdb4095a771af39cc213a7a69d4ae2cc3c64ecec1621910fd7b405aa0da5"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-064-V1.md",
+      "sha256": "bdc6e9371a0b659e3a8b54d22e7655bcb499f09dfaddf33195a79fab5ce382b2"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-064-V2.md",
+      "sha256": "9d9eceb81fbb21a25e03535473999e315fc4789051b5990428b1108e85b7ed43"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-065-V1.md",
+      "sha256": "26f0db1c60bbe923486d12763d66b031d3ea2a5a136aa1f8b921924f9afb7491"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-065-V2.md",
+      "sha256": "ded530d73c59693a317e902627f621342369f5857afa2974ab277f77bc71f274"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-066-V1.md",
+      "sha256": "bd8fff62751627960b1c51c36debcf71bc8beaebb2076256699160540e1daef3"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-066-V2.md",
+      "sha256": "410db9070274ac9158042086e8c75af01c1c00e9a0394cb3dd77b4335b62404c"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-067-V1.md",
+      "sha256": "be85c0cbf996c8b2254c2e6af0f8b3102ac688abba1df8104914289479b9bc29"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-067-V2.md",
+      "sha256": "b781c98fddf710d87dd0c16d79cc466c7bb9bd224d07f0f0cbe0ebcf0961383e"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-068-V1.md",
+      "sha256": "852d594256ffc085d67f5f90edad3cea2e29aec03f6ee1f43826d26f53d54082"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-068-V2.md",
+      "sha256": "a75fb9aa6122ef58efaabe621d68ecb4e196ee3a7df8bfe03721dc62e6369882"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-069-V1.md",
+      "sha256": "2cb626962312de004b09adb891c3d8ab9a643e84dc5b422b4340ac2abe38bbd3"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-069-V2.md",
+      "sha256": "52ad1f24149bc9dfcd56c68096bdb0697539fa48bad704d6d5b3529fed90bbaa"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-070-V1.md",
+      "sha256": "6c99b273896be70a106c384d640a401165096b08b45126ae095234bdf0005033"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-070-V2.md",
+      "sha256": "cd99be5bc01b9fb30da9e40c43b3180189c63155b962f841a93aa4e572e23aa2"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-071-V1.md",
+      "sha256": "3bc5dc5640d32c97ec6786fd42faa87206bea58891a9cb4fa62acb6e66edd8e8"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-071-V2.md",
+      "sha256": "8f34c9e5b4daa7176e7f827e5543ff5fa488a161b920385872d15e12de1c59df"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-072-V1.md",
+      "sha256": "21a5fc8a5163d83aa7a804f16e149a262a8184e951f1d09c7a0a2903ee7f4ebb"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-072-V2.md",
+      "sha256": "0d4499ff40d4e3ee531175bd7d1659244fcb5e795a118a2a9e73748da3116f93"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-073-V1.md",
+      "sha256": "701987fe381c5d76b3032ee2282ca86f38ab774bb808859da6455f7941f33819"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-073-V2.md",
+      "sha256": "3993bb040abedc0809d356e277a6107580c1d0470e6fb5900aa842c9a15e9300"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-074-V1.md",
+      "sha256": "69e30a7b0f8fe55772035d400fec38464d6a172b2bc72c205bba1df6e45f0bb5"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-074-V2.md",
+      "sha256": "9e74d33b5b525be51c4260390c7a715f639b35f8d61b483772bc71030280d305"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-075-V1.md",
+      "sha256": "d2fcebe477a3db7fba7652a457da28dc71ee70c6ea850985aaa3d7b54cbda75a"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-075-V2.md",
+      "sha256": "ceb89ebb77f2ecaf26d748660af0d94f3d35c0dfe01646273704c5ff17956093"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-076-V1.md",
+      "sha256": "ea6f3d4eac8265dcddfd808caf5e900d9d139e595215fc0b058258657958baf5"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-076-V2.md",
+      "sha256": "bac0c798ab5188d836daf9b7e128678cc22027cd4ddb1479cbc5dd136ca64199"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-077-V1.md",
+      "sha256": "5f966eb4648badd2a3d63773c6be0ddb37529cc57ad11be5dafbc2c65717916b"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-077-V2.md",
+      "sha256": "6529cfd28648af60888b7254d7c3094ba81109ef274131f3a920b85a9615fb66"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-078-V1.md",
+      "sha256": "4dbc8e02d3194f712155f3923b22599c4097da1d84d66fb68c51fa3ee6355c19"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-078-V2.md",
+      "sha256": "9fe10a46a9928bb77d2d5b7421abcafa50639f07f275c26f797f82e519b9655e"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-079-V1.md",
+      "sha256": "deea77e95e096b6070a3582a4a612cbae3d17af951bcf0c99682ba87ba927b54"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-079-V2.md",
+      "sha256": "4f349fae4439fd1135634a5de81533a2e597634f5e1e7c710d5b9db84d1fde34"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-080-V1.md",
+      "sha256": "1979b135e6182de6b679b177d2221e53aeca25e18a57c51d3d164d1e45af153b"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-080-V2.md",
+      "sha256": "454746a812227d2e4c39b301a482bb10fd249eb7853229573d8ff4e6b136884e"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-081-V1.md",
+      "sha256": "5481ada71abbc8b749b3a7b47ad3fc6fd2033e1a9929ea98a357f866df144694"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-081-V2.md",
+      "sha256": "90fff3f6b147f32c189260b4a1cf0e81971800526253fcf0eb9ec91a05eca4c7"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-082-V1.md",
+      "sha256": "541f814e66430e87a3f742b303756aab18296df81f5823fb718aa531540067a6"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-082-V2.md",
+      "sha256": "04b1497c19b1795ca287fb02bd9b457aa0f6139758e339417628823852ae4f5e"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-083-V1.md",
+      "sha256": "f58585b2ad354759b340f60abe21c618c8697eaa9ed25e20cdd4b8d47e1ad21a"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-083-V2.md",
+      "sha256": "31b3e53f4073b0a65d7ca65c265d2e05da7053de62fa35d2bfdd118a3570e345"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-084-V1.md",
+      "sha256": "fd051358cdbb5969e904cc3fe53c7d6990cee1fe2154b91cb686a068469c5976"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-084-V2.md",
+      "sha256": "1495dd6bc585f5043734513265316d12cf3d7c9818f4a7bc2b3fe269b7b8773d"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-085-V1.md",
+      "sha256": "b840ece6df5d83cfafb8373efa0c60c7c0c2f6fc93b7e4fc06658d65b001b788"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-085-V2.md",
+      "sha256": "41083d0d4c9c207968ded09bfd9ea79d79666b9dbc714556d7e930f174e569af"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-086-V1.md",
+      "sha256": "f7640b833cc5f683aa1703aaec2738b067ba9ec90f33f252e7e44169074989d7"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-086-V2.md",
+      "sha256": "05675630415a3f2095f73df3650bf566d58f16673c2d70ab617eee0c4284baf6"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-087-V1.md",
+      "sha256": "75fa5f215bd9fbbb39f31e972e1276df917037e8885459ce9a3584a910faebb3"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-087-V2.md",
+      "sha256": "4eebe234c2869815fe9652d1168827b2f14d0a51bd8eeef11fa0df3d3f349847"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-088-V1.md",
+      "sha256": "54e493754f6a2cef538043ae703e1946a167c35132179845483118a781f0be17"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-088-V2.md",
+      "sha256": "753ded06a1f0fe6f7dbfcc3b237787201a42492393bb210f90954a3b7cb4eaa0"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-089-V1.md",
+      "sha256": "a8d2d613749bfae155572b886851cba88c30e75cef54e86301d25bf23cd9e82d"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-089-V2.md",
+      "sha256": "7414792718254ece363f9ac952d193ecb18ce616f0afd91c92a1aee06cb4a46f"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-090-V1.md",
+      "sha256": "879971874d82706e4904bd85f0649496557e43792e566bae2046d69e6c9f17fc"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-090-V2.md",
+      "sha256": "73310e679795f60e20136f1eb4ef7afb9ac2d609e7bae28606ab2fe210654f9c"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-091-V1.md",
+      "sha256": "bb9554e315ab8cdc9a57a7ad26dcab7ca843b49a98e356d3211d38e02e33e3b7"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-091-V2.md",
+      "sha256": "018f01203ca539a9d9af1e5be3ffec1d79cf4339567734e3852e2ea75e3a2251"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-092-V1.md",
+      "sha256": "7bf45e9272d14750885d20e0e01586ace614f8fc9cb506e95994a6b77ac8021a"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-092-V2.md",
+      "sha256": "c58458c7603d2d4768bc3b06319773f55be1d01d6e5ac804044c291c8a8c269f"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-093-V1.md",
+      "sha256": "d653afbb75b4c972449bb7de082870de786af5477e54ec13d6feaf33f92380cb"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-093-V2.md",
+      "sha256": "08307455c7d1c20695634b7083f6aa0a8f06bdc088f617b3959677faec11e925"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-094-V1.md",
+      "sha256": "a3cddb34d27d5bfc55b0c4c844835e067704d89eb33bcf32a6dd6d0c072f4f16"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-094-V2.md",
+      "sha256": "67301f83dc5334715b90e7c4c4d9229e6ddc8a1d720793a278d29bd995ec6ffe"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-095-V1.md",
+      "sha256": "ce9a48b74fe08bc90d419e94382c371f471987ad5d0fe0ba94d5dcdeb1a6a904"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-095-V2.md",
+      "sha256": "c524f4a7396dd4d6d7ab41836d567f5bde79bac56b06a837a19d4b75a35384df"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-096-V1.md",
+      "sha256": "36c0bbeef8c49a66c8d4a6ecbcd462c4809e57b45163ed489621ebadcdb618d3"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-096-V2.md",
+      "sha256": "65f28735940de49cc8fc5a1a4b7c6d3eb992321f83799c9e3ef957344ae3ec9f"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-097-V1.md",
+      "sha256": "1215a406eda106f28a5536836b536f6404f9cb4c29daa140694de85872042000"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-097-V2.md",
+      "sha256": "804407f35ee6f0ceab286db9dc07690acb08008a4649ee6162792f1ba981c9ec"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-098-V1.md",
+      "sha256": "c8fed348fb275332e983bf1d13cdf5ae67029f8345dab3bc81ee517f58dcec54"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-098-V2.md",
+      "sha256": "c153b1e55983a154ac6655e0fb9767b02a86e1e4186728b0697bddb35ed6f787"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-099-V1.md",
+      "sha256": "82c134159001de07057048abfe2d37b575c16408fd75c25ffc7f333ccbbdaf67"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-099-V2.md",
+      "sha256": "a8195ee2337d06123aa9e9bf965a518e24d1a107b0dba9912d9d81a34bf5391a"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-100-V1.md",
+      "sha256": "4da4e8718f2d11e7f671de7398bdbbc6e882f81ca24b4215619a51a688ae43e6"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-100-V2.md",
+      "sha256": "2344d4341d4b9f511e6989666c5eddde2cbb18f5d8b0a58c36d2ef5222dc973d"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-101-V1.md",
+      "sha256": "ab28bdb6d90c590159ab417eb433016c2b8f1ddc2043aa4874c8f1aaeca994f1"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-101-V2.md",
+      "sha256": "c58c5cd6bc3c32777ab2227ae0714803b2ae025295a47130963df7fe87e92ecd"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-102-V1.md",
+      "sha256": "31212c70dcb0097d0c1d9310ba5b37e09bf0aec3707fe02065534d68a67251f8"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-102-V2.md",
+      "sha256": "82bfc5892cc1f703d4ce34bf23cd1b2d121606f68ea543560aedb6856910bbab"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-103-V1.md",
+      "sha256": "75844c37d3dda5098ffb879648ab970ec4eb8cad288da1b0c83964e4f3f0625c"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-103-V2.md",
+      "sha256": "f3c3586f90c31f435c88aea5eeb55b9053a61f891ae76b7abe023c8f310cf2e5"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-104-V1.md",
+      "sha256": "a8fec62b6ed59210515516820b70191c923a318bc20010742a96cb35d655ff77"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-104-V2.md",
+      "sha256": "f964822fb3391280eecdb6973777a87c3bcad87ea6256e77f629d8447d2a6e4e"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-105-V1.md",
+      "sha256": "af8fbf22194558b696726714e1336a5d4f2473f060b5b050f4cbc1591162453d"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-105-V2.md",
+      "sha256": "2d1b3991e8e753601ec5e12978e33915b3c4f60df942d497989aecfc0e1843ac"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-106-V1.md",
+      "sha256": "3fe6daa6a0e23faf80ccb47a91d66d8c09ec54d26d478b9b8693e4f31c0f2670"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-106-V2.md",
+      "sha256": "d8869fe8ecc332f3d0e874974419e433bec9865d9500c44c229a67b1c5dbd4ca"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-107-V1.md",
+      "sha256": "34f3d4f6d6bf3832c6e4806bf1cc3599330b892fbfe2c1063724b6a48db23992"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-107-V2.md",
+      "sha256": "e391cb32d47e24cbf98721dc7e9efd4702e8f7e504a573a7eaac33513f3d9068"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-108-V1.md",
+      "sha256": "d399b0d8bfa79e7a002ef09162605d45a05ccf62fd01a6413ae2a032edcb97dc"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-108-V2.md",
+      "sha256": "66c2b42edf6b0647cea91fabd71598e850be2f84fb904c3e7f1b3b76d93f6661"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-109-V1.md",
+      "sha256": "6ba9d44753876e68383fb62476413bb72fb6ca1588ada1a265254fc575737a8e"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-109-V2.md",
+      "sha256": "3a441c320dc5ced0bb8e9c1c308de41a145e762a34ee519027c0f248282a3a36"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-110-V1.md",
+      "sha256": "d66df734ab698dfc6b17901da37e6fd5df8a448d47bcb0a869b5cec711885da3"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-110-V2.md",
+      "sha256": "66a49ca9a53dd4bf1b1726d8182844355fa8e391f4ea5a693c0bece56afd70a2"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-111-V1.md",
+      "sha256": "d06dbd449bcdee7a421c17a7fd91ede11ca0ae034f36692002676bea1753d548"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-111-V2.md",
+      "sha256": "1167f0778bc7466fb05b42263d280a467cf0c7b261fa74298b8fcd282f82d368"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-112-V1.md",
+      "sha256": "b728602f2dd3b796234a767eadd26cf60e02bad0833559b666a6d55336daddd8"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-112-V2.md",
+      "sha256": "86f408910256ab626fd3163449d73fd6cd9e624f023bd4bc30f324c2fe0ba052"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-113-V1.md",
+      "sha256": "8165d4e27a5b3c302f1fd4729cdd33fe3d018115b3165bec6920f8f3c7a13a2f"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-113-V2.md",
+      "sha256": "80325f78a73d0478513722d45ca3cbc3af9b019e8ae661ba2825e54f04f0ff89"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-114-V1.md",
+      "sha256": "2d2a4255aaf1bd8887c8f48ed19365f8d8048ba0724c2885596c7595be7a7c79"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-114-V2.md",
+      "sha256": "17477d04fba84ab37a5b78129bd23387afb0f89ed90a15cb633a72c0397d3a14"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-115-V1.md",
+      "sha256": "7ae8690a4b53e3bca06de7bd8c82501aaffe07de7dfa3eac13d7930f792cbdea"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-115-V2.md",
+      "sha256": "4e972de5370dd49d2ace6f7d930dfc2d8176486327261eb2a1543133756d2f15"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-116-V1.md",
+      "sha256": "a3d39f184cee5bc2e77335921fd6010cbf1ed2defce0a8d3389c3fc29afd62ed"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-116-V2.md",
+      "sha256": "4f2cc5f093d2c05b7bc68a3084243d1f89dba0a78db6124dfd76ff85ba883d08"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-117-V1.md",
+      "sha256": "d167f06a6842f19ccccf710458d7c6719f62254670d3a2f4e45327e167310446"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-117-V2.md",
+      "sha256": "25d5a7a54180b85cff1d29a2d58724662a65edc6f21e949320b1c1a98ab4131a"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-118-V1.md",
+      "sha256": "6d153af1a303e05c606a1aa927086aaf465113c07d39abf59016ea201b1cd3b4"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-118-V2.md",
+      "sha256": "506636d9319e750f25ea60dcd1554a4b948e3d6cbd69eafe06ec41e38bd14c3c"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-119-V1.md",
+      "sha256": "5a2fcd5ff5c744048868be48705bca5724b4b287b5d00e48d167d49ce26b4c48"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-119-V2.md",
+      "sha256": "62086af9e1a35a187a9729dd3ff4428c8648d9991d95ae063aa2a4e70d64d109"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-120-V1.md",
+      "sha256": "efa63b9cf062b587dc6f5f413e87481a530878b0ccaecfaf9c0a0ac58ffc40df"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-120-V2.md",
+      "sha256": "750c06c23d9ca53ecfb0e2a6e8c9f21d8a9e52daf3449c114c94fe7ab957c9ef"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-121-V1.md",
+      "sha256": "190d2d69dcb904ea82c75dcc92ba51b62ead94313d7e1ef5fd8603c063b534a1"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-121-V2.md",
+      "sha256": "e1b53c0ce916f4a35cf4328602d29498785b4ddffe2e0f680f8ed28a4cecb7d5"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-122-V1.md",
+      "sha256": "395928a5a55fd8f96401bb46c1c02a8afc9e5e4a1cd3d7f733a5fb8592138ea8"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-122-V2.md",
+      "sha256": "759a976848554e9e67e21d9a4741f62a84191aa9af547bf6a91fd287a3f67b98"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-123-V1.md",
+      "sha256": "b325949c96ac2c2305a52c4b6fcd297d25e58ac6f31508d1b9f142fef1b77952"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-123-V2.md",
+      "sha256": "94f2e4e053775318148bd0832c52cf96be03899a9e34f24549a98f4cc7564052"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-124-V1.md",
+      "sha256": "29a702f23e94ccf255b24615684b79b80fc6f4e8ba4a76bcd93a3d2ffc600c32"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-124-V2.md",
+      "sha256": "ff4b8b73123bac8e5ab093fa05f1af4d7dc761b0e426c8712a885002299783cd"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-125-V1.md",
+      "sha256": "2bc82ea79b2e78951cbe8e9d7d62b75b0dbb5ae7db40478d083f3232a2c82301"
+    },
+    {
+      "path": "data/generated/rule_docs/documents/POL-125-V2.md",
+      "sha256": "fc8ccddd601a054b60c8a0caf452272d41cf986e31d6486be3465421a5638975"
+    },
+    {
+      "path": "eval/datasets/stage1_eval.jsonl",
+      "sha256": "b9a196275f54af49a61c8aa206bdc93bac3f6febb849cd29301a36b03f284b04"
+    }
+  ],
+  "config_snapshot": "project:\n  name: finops-copilot\n  stage: stage_1\n  synthetic_only: true\n  random_seed: 20261021\n\norders:\n  target_rows: 50000\n  output:\n    directory: data/generated/orders\n    filename: orders.csv\n    encoding: utf-8\n    anomaly_labels_filename: anomaly_labels.jsonl\n    overwrite_existing: false\n\n  schema:\n    - name: order_id\n      type: string\n      nullable: false\n      description: Unique synthetic order identifier.\n    - name: customer_id\n      type: string\n      nullable: false\n      description: Synthetic pseudonymous customer identifier.\n    - name: merchant_id\n      type: string\n      nullable: false\n      description: Synthetic merchant identifier.\n    - name: order_time\n      type: datetime\n      nullable: false\n      description: ISO-8601 order time with Asia/Shanghai UTC+08:00 offset.\n    - name: status\n      type: string\n      nullable: false\n      description: Synthetic lifecycle state.\n    - name: category\n      type: string\n      nullable: false\n      description: One of four synthetic product categories.\n    - name: quantity\n      type: integer\n      nullable: false\n      description: Positive units per order line; one injected anomaly may be negative.\n    - name: unit_price_minor\n      type: integer\n      nullable: false\n      description: Unit price in CNY fen (integer minor units).\n    - name: discount_minor\n      type: integer\n      nullable: false\n      description: Order-level discount in CNY fen, non-negative.\n    - name: shipping_fee_minor\n      type: integer\n      nullable: false\n      description: Customer-paid shipping fee in CNY fen.\n    - name: paid_amount_minor\n      type: integer\n      nullable: false\n      description: quantity * unit_price_minor - discount_minor + shipping_fee_minor.\n    - name: refunded_amount_minor\n      type: integer\n      nullable: false\n      description: Refund amount in CNY fen; normally between zero and paid amount.\n    - name: payment_method\n      type: string\n      nullable: false\n      description: Synthetic payment method.\n    - name: source_channel\n      type: string\n      nullable: false\n      description: One of four synthetic acquisition channels.\n\n  business_semantics:\n    currency: CNY\n    amount_storage_unit: fen\n    amount_display_unit: yuan\n    amount_display_rule: Divide integer fen by 100 and display exactly two decimal places.\n    revenue_statuses: [completed, shipped]\n    net_revenue_formula: paid_amount_minor - refunded_amount_minor\n    revenue_formula: Sum net_revenue_formula only for rows whose status is completed or shipped.\n    order_count_definition: Every row is one synthetic order; invalid rows remain present for data-quality evaluation.\n    date_field_for_reporting: order_time\n    reporting_timezone: Asia/Shanghai\n    status_semantics: Status is evaluated as stored; do not infer revenue from payment alone.\n\n  dimensions:\n    customer_count: 10000\n    merchants:\n      count: 50\n      id_prefix: MRC\n      distribution: uniform\n    categories:\n      # 合成默认：你只确认了“4 个品类”，下面的枚举可按真实业务替换。\n      - id: electronics\n        share: 0.25\n      - id: home_living\n        share: 0.25\n      - id: apparel\n        share: 0.25\n      - id: beauty_personal_care\n        share: 0.25\n    statuses:\n      - id: completed\n        share: 0.50\n      - id: shipped\n        share: 0.18\n      - id: pending\n        share: 0.08\n      - id: cancelled\n        share: 0.10\n      - id: refunded\n        share: 0.14\n    payment_methods:\n      - alipay\n      - wechat_pay\n      - bank_card\n      - platform_wallet\n    source_channels:\n      # 合成默认：你只确认了“4 个渠道”，下面的枚举及占比可按真实业务替换。\n      - id: app\n        share: 0.35\n      - id: mini_program\n        share: 0.30\n      - id: web\n        share: 0.20\n      - id: marketplace\n        share: 0.15\n\n  date_range:\n    start: \"2025-01-01\"\n    end: \"2025-12-31\"\n    end_inclusive: true\n    campaign_probability: 0.20\n    campaign_window_radius_days: 3\n    campaign_dates:\n      - \"2025-06-18\"\n      - \"2025-11-11\"\n    baseline_distribution: Uniform across non-campaign dates and seconds within a day.\n    campaign_distribution: Uniform across configured campaign windows and seconds within a day.\n\n  generation_defaults:\n    # 合成默认参数：用于生成形态合理、金额关系可校验的订单，不代表真实业务分布。\n    quantity_range_inclusive: [1, 5]\n    unit_price_minor_by_category:\n      electronics: [15000, 2500000]\n      home_living: [5000, 450000]\n      apparel: [2000, 120000]\n      beauty_personal_care: [1500, 80000]\n    normal_discount_rate_range: [0.0, 0.15]\n    campaign_discount_rate_range: [0.05, 0.30]\n    shipping_fee_probability: 0.35\n    shipping_fee_minor_range: [500, 2500]\n    completed_or_shipped_partial_refund_probability: 0.05\n    partial_refund_rate_range: [0.10, 0.50]\n    refunded_status_refund_rate_range: [0.50, 1.00]\n\n  dirty_data:\n    target_row_rate: 0.06\n    overlap_policy: exactly_one_anomaly_per_dirty_row\n    ground_truth:\n      enabled: true\n      sidecar_filename: anomaly_labels.jsonl\n      expose_labels_to_agent: false\n    # 六类异常各占全量记录 1%；在 50,000 行时每类 500 条、总计恰好 3,000 条。\n    rules:\n      - id: negative_quantity\n        field: quantity\n        rate_of_all_rows: 0.01\n        generation_rule: Set quantity to -1.\n        expected_handling: Quarantine the row and flag a non-positive quantity.\n      - id: unsupported_status\n        field: status\n        rate_of_all_rows: 0.01\n        generation_rule: Set status to legacy_in_transit, outside the canonical status list.\n        expected_handling: Reject the status for canonical revenue aggregation and flag it for mapping.\n      - id: refund_exceeds_paid\n        field: refunded_amount_minor\n        rate_of_all_rows: 0.01\n        generation_rule: Set refunded_amount_minor to paid_amount_minor + 1.\n        expected_handling: Flag the refund as financially inconsistent; do not silently clamp it.\n      - id: paid_amount_mismatch\n        field: paid_amount_minor\n        rate_of_all_rows: 0.01\n        generation_rule: Add 137 fen to the correctly generated paid amount.\n        expected_handling: Recompute against quantity, unit price, discount, and shipping fee; flag mismatch.\n      - id: malformed_order_time\n        field: order_time\n        rate_of_all_rows: 0.01\n        generation_rule: Replace the ISO-8601 timestamp with not-a-timestamp.\n        expected_handling: Quarantine the row from time-based reporting and flag parse failure.\n      - id: unknown_channel\n        field: source_channel\n        rate_of_all_rows: 0.01\n        generation_rule: Set source_channel to partner_feed_x, outside the canonical channel list.\n        expected_handling: Flag for channel mapping; do not silently merge into a known channel.\n\nrule_documents:\n  target_chunks: 5000\n  output:\n    directory: data/generated/rule_docs\n    documents_subdirectory: documents\n    chunks_filename: chunks.jsonl\n    encoding: utf-8\n  document_families:\n    # 合成规则主题；均为示例内容，不代表真实平台或法律合规意见。\n    - order_lifecycle\n    - revenue_recognition\n    - refund_accounting\n    - discount_allocation\n    - shipping_fee_settlement\n    - merchant_settlement\n    - channel_attribution\n    - payment_capture\n    - fulfillment_confirmation\n    - cancellation_handling\n    - duplicate_order_handling\n    - reporting_timezone\n    - category_eligibility\n    - return_window\n    - partial_refund\n    - chargeback_handling\n    - merchant_fee\n    - promotion_stacking\n    - split_shipment\n    - reconciliation_tolerance\n    - order_date_basis\n    - tax_documentation\n    - coupon_eligibility\n    - inventory_reservation\n    - data_quality_review\n  scopes:\n    - global\n    - electronics\n    - home_living\n    - apparel\n    - beauty_personal_care\n  document_count: 250\n  chunks_per_document_target: 20\n  version_policy:\n    versions: [V1, V2]\n    v1_effective_from: \"2025-01-01\"\n    v2_effective_from: \"2025-07-01\"\n    precedence: Use the version effective on the queried business date; V2 is authoritative for current-date questions.\n    retain_superseded_versions: true\n  authority_policy: Explicit effective dates govern; a newer version supersedes an older version from its effective date.\n  synthetic_parameters:\n    # 合成默认：仅用于构造可检验的边界题，不作为真实平台售后承诺。\n    refund_window_days_by_scope:\n      global: 7\n      electronics: 7\n      home_living: 15\n      apparel: 7\n      beauty_personal_care: 7\n    reconciliation_tolerance_minor: 100\n  chunking:\n    strategy: One heading-aware policy clause per chunk, with no overlap.\n    target_tokens: 180\n    overlap_tokens: 0\n    metadata_fields: [doc_id, version, page, line_start, line_end, chunk_id]\n  retrieval_traps:\n    # 合成默认：四类陷阱用于离线检索评测，不代表已验证的生产风险分布。\n    taxonomy:\n      - id: version_conflict\n        description: Current V2 policy conflicts with a superseded V1 clause.\n      - id: boundary_exception\n        description: Inclusive threshold and exception wording must be read precisely.\n      - id: negation_lexical_decoy\n        description: Similar words appear in a nearby clause, but negation changes the answer.\n      - id: unanswerable\n        description: Corpus contains related context but no evidence that answers the requested fact.\n    questions_per_type: 30\n\nevaluation:\n  target_qa_pairs: 120\n  split:\n    development: 60\n    validation: 30\n    holdout: 30\n  output:\n    directory: eval/datasets\n    filename: stage1_eval.jsonl\n  fields:\n    - question_id\n    - split\n    - trap_type\n    - query\n    - expected_answer\n    - must_abstain\n    - gold_doc_ids\n    - gold_chunk_ids\n    - hard_negative_chunk_ids\n    - rationale\n  metrics:\n    - recall_at_k\n    - mrr_at_k\n    - precision_at_k\n    - citation_support_rate\n  report_note: Synthetic corpus results are offline evaluation results, not production accuracy.\n\nartifacts:\n  manifest_path: reports/stage1_manifest.json\n  include_config_snapshot: true\n  include_sha256: true\n  fail_if_output_exists: true\n",
+  "evaluation": {
+    "must_abstain": 30,
+    "qa_pairs": 120,
+    "split_counts": {
+      "development": 60,
+      "holdout": 30,
+      "validation": 30
+    },
+    "trap_counts": {
+      "boundary_exception": 30,
+      "negation_lexical_decoy": 30,
+      "unanswerable": 30,
+      "version_conflict": 30
+    }
+  },
+  "project": "finops-copilot",
+  "random_seed": 20261021,
+  "stage": "stage_1",
+  "summary": {
+    "anomaly_counts": {
+      "malformed_order_time": 500,
+      "negative_quantity": 500,
+      "paid_amount_mismatch": 500,
+      "refund_exceeds_paid": 500,
+      "unknown_channel": 500,
+      "unsupported_status": 500
+    },
+    "dirty_order_rate": 0.06,
+    "dirty_orders": 3000,
+    "orders": 50000,
+    "rule_chunks": 5000,
+    "rule_documents": 250
+  },
+  "synthetic_only": true
+}

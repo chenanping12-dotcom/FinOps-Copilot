@@ -1,0 +1,31 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.env
+.env.*
+!.env.example
+
+# Generated datasets can be large and are reproducible from config/data_spec.yaml.
+data/raw/*
+!data/raw/.gitkeep
+data/generated/*
+!data/generated/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+models/
+reports/*
+!reports/.gitkeep
+# 阶段证据文件要进仓库：它们是简历上指标数字的原始出处
+!reports/*.md
+!reports/*.json
+*.sqlite
+*.sqlite3
+*.db

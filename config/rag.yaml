@@ -1,0 +1,57 @@
+project:
+  random_seed: 20261021
+
+corpus:
+  chunks_path: data/generated/rule_docs/chunks.jsonl
+  stage1_manifest_path: reports/stage1_manifest.json
+  parent_grouping: doc_id_and_page
+  parent_context: true
+
+retrieval:
+  # TODO(HUMAN): 初始值用于首轮离线评测；后续应只用 Dev/Val 调整，不以 Holdout 反复调参。
+  bm25:
+    k1: 1.5
+    b: 0.75
+    cjk_tokenizer: character_bigrams
+  dense:
+    backend: sentence_transformers
+    model_id: BAAI/bge-small-zh-v1.5
+    revision: null # Resolve main on first run; report the resolved model commit.
+    query_instruction: "为这个句子生成表示以用于检索相关文章："
+    batch_size: 48
+    normalize_embeddings: true
+    max_seq_length: 512
+  fusion:
+    method: reciprocal_rank_fusion
+    rrf_k: 60
+    candidate_k: 100
+  reranker:
+    backend: sentence_transformers
+    model_id: BAAI/bge-reranker-base
+    revision: null # Resolve main on first run; report the resolved model commit.
+    batch_size: 8
+    max_length: 384
+    # 100 -> 20, decided by the Stage 2 window sweep (see
+    # reports/stage2_retrieval_findings.md option A). On this synthetic corpus the
+    # Cross-Encoder saturates (all 100 candidates within a 0.0034 score band), so a
+    # wider window only feeds near-duplicates into the tie-break and pushes gold
+    # out of top-5. Measured: window 20 gives Recall@5 1.0000 / MRR@5 0.6133 at
+    # ~1069 ms per query, versus Recall@5 0.9889 / MRR@5 0.6106 / 4586 ms at 100.
+    candidate_k: 20
+  top_k: 5
+  device: auto
+  model_cache: models/huggingface
+
+evaluation:
+  dataset_path: eval/datasets/stage1_eval.jsonl
+  k: 5
+  include_splits: [development, validation, holdout]
+  exclude_unanswerable_from_retrieval_metrics: true
+  bad_case_count: 2
+
+output:
+  directory: eval/reports/rag
+  rankings_filename: rankings.jsonl
+  comparison_filename: ablation.json
+  markdown_filename: ablation.md
+  bad_cases_filename: bad_cases.json
