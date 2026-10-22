@@ -311,7 +311,7 @@ docker compose run --rm api python scripts/build_orders_db.py    # 产出 data/p
 
 1. **加 `src/gateway/server.py`**：把 `serve_gateway.py` 的内容搬进 `src/`，提供模块级 `app` + 环境变量配置。之后容器里可以直接
    `CMD ["uvicorn", "src.gateway.server:app", "--host", "0.0.0.0", "--port", "8000"]`，不用构建时生成文件。
-2. **给 UI 依赖一个正式出口**：`streamlit` / `requests` / `pandas` 目前不在 `pyproject.toml` 里，前端同事用了 `requirements-app.txt` 单独声明（该文件当前**未纳入 git**）。建议在 `pyproject.toml` 加一个 `ui` extra，或把 `requirements-app.txt` 提交进去。现在 `Dockerfile` 里是硬编码 `streamlit>=1.40,<2` 兜底，就是为了不依赖一个可能不存在的文件。
+2. **给 UI 依赖一个正式出口**：`streamlit` / `requests` / `pandas` 不在 `pyproject.toml` 里，单独声明在 `requirements-app.txt`（该文件**已纳入 git**，见 `git ls-files`）。建议在 `pyproject.toml` 加一个 `ui` extra，让依赖只有一个出口。现在 `Dockerfile` 里是硬编码 `streamlit>=1.40,<2` 兜底，就是为了不依赖这个单独文件。
 3. **`.dockerignore` 里不要把 `models/` 和 `data/` 漏掉**：现在两处都排除了。如果哪天有人改成 `COPY . .`，1.2 GB 模型会直接进镜像层。
 
 ---
