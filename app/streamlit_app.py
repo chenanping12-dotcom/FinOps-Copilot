@@ -454,7 +454,25 @@ def _render_rag_result(hits: list[Any], elapsed: float, mode: str, query: str) -
             st.markdown("**同页父块原文（Parent-Child 的 parent）**")
             st.write(chunk.parent_text)
             st.caption("各路召回证据（rank/score）")
-            st.json(hit.components)
+            st.json(_as_json_object(hit.components))
+
+
+def _as_json_object(value: Any) -> Any:
+    """把任意值收敛成 JSON 对象再交给 ``st.json``。
+
+    实测坑：Streamlit 的 JSON 视图组件（`reactJsonViewCompat`）只接受
+    **JSON 对象**。传 ``None``（refuse/sql 路由下 ``state.decision`` 就是
+    ``None``）或传数组（``state.trace``）时，前端会渲染成一个刺眼的
+    ``{"ERROR": {"message": "src property must be a valid json object"}}`` 框，
+    看上去像程序崩了，其实只是这个组件不收非对象值。
+    """
+    if isinstance(value, dict):
+        return value
+    if value is None:
+        return {}
+    if isinstance(value, (list, tuple)):
+        return {"items": list(value)}
+    return {"value": value}
 
 
 def _render_agent_result(state: Any, elapsed: float) -> None:
@@ -478,7 +496,7 @@ def _render_agent_result(state: Any, elapsed: float) -> None:
     info_col, decision_col = st.columns(2)
     with info_col:
         st.markdown("**工具调用参数 / 决策**")
-        st.json(state.decision)
+        st.json(_as_json_object(state.decision))
         if result is not None and result.sql:
             st.markdown("**实际执行的 SQL（只读）**")
             st.code(result.sql, language="sql")
@@ -492,9 +510,9 @@ def _render_agent_result(state: Any, elapsed: float) -> None:
             st.caption("无返回行。")
 
     with st.expander("state.trace（每个节点的执行轨迹，可核对工具选择）"):
-        st.json(state.trace)
+        st.json(_as_json_object(state.trace))
     with st.expander("完整 AgentState.as_dict()"):
-        st.json(state.as_dict())
+        st.json(_as_json_object(state.as_dict()))
 
 
 def _sidebar(rag_config: dict[str, Any]) -> tuple[str, int]:

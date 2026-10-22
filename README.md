@@ -22,6 +22,21 @@
 5. **容器化部署** — `Dockerfile` 单镜像双角色（API 8000 / UI 8501），依赖层与代码层分离，非 root（uid/gid 1001）运行；`docker-compose.yml` 用 healthcheck + `depends_on: service_healthy` 编排启动顺序。
 6. **真实数据接入** — `scripts/ingest_real_data.py` 下载 UCI Online Retail II，规范化到项目的 14 列契约并建 `data/processed/real_orders.db`；**不读写、不覆盖 Stage 1 的任何产物**。
 
+## 运行效果
+
+下图是本地实跑（无外网、无 LLM Key）截的真实界面，不是效果图：
+
+![Demo 总览](docs/demo/00-Demo总览.png)
+
+六个画面分别对应：① 首页（检索配置与预设题）、② 知识库问答（混合检索 + 精排，
+每条命中都带 `[Doc_ID, Page, Line]` 溯源）、④ 经营指标（`metric` 路由 + 口径说明 +
+真实返回行）、⑤ 安全兜底（问「删掉所有订单」→ `refuse` 路由，不产出任何写 SQL）、
+⑥⑦ 同一问题的纯 BM25 与混合+精排排序对照（BM25 把旧版 `POL-013-V1` 排在首位，
+精排把当前生效的 `POL-013-V2` 提到首位）。
+
+截图与采集脚本见 `app/capture_demo.py`、`app/capture_demo2.py`、`app/build_contact_sheet.py`
+（通过 Chrome DevTools Protocol 驱动真实浏览器点击，不是手工摆拍）。
+
 ## 快速开始
 
 环境要求 Python 3.11+（本机实测运行环境为 3.13.3）。
