@@ -36,7 +36,9 @@ SCENARIO_GUARD = "只读 SQL 护栏拦截测试"
 
 
 class Chrome:
-    def __init__(self) -> None:
+    def __init__(self, window: str = "1600,1700") -> None:
+        # window 可调：截图靠普通视口（见 Session.shot 的注释），所以整页比视口高时
+        # 只能把窗口开得更高，不能改用 captureBeyondViewport。
         self.profile = tempfile.mkdtemp(prefix="cdp-profile-")
         self.proc = subprocess.Popen(
             [
@@ -51,7 +53,7 @@ class Chrome:
                 # 本机显示缩放不是 100% 时，无头 Chrome 的位图与 CSS 像素会不一致，
                 # 截出来的侧边栏会被横向压窄（文字看着像被切）。钉死 DSF=1。
                 "--force-device-scale-factor=1",
-                "--window-size=1600,1700",
+                f"--window-size={window}",
                 "--hide-scrollbars",
                 f"--user-data-dir={self.profile}",
                 APP_URL,

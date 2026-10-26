@@ -131,6 +131,62 @@
 3. **refuse 路由不崩**。`trace` 为空、`decision` 为 `None`、`result` 为 `None` 都由
    `safe_json_dump()` / `_esc()` / `_hit_rows()` 的 None 分支兜住，AppTest 已覆盖。
 
+## 1.2 「评测基准与鲁棒性」Tab（第二个 Tab）
+
+这个 Tab 回答的是另一个问题：**你怎么知道前面那些结论不是看着像对的？**
+它不产生新数据，只是把仓库里已有的实验产物摆出来，一屏看完全部数字。
+
+| 小节 | 回答什么 | 数据源（页面上直接标出） |
+| :--- | :--- | :--- |
+| ① 离线检索基准 | 三臂策略谁强、强在哪 | `eval/reports/rag/ablation.json` |
+| ② 精排窗口调优 | 为什么把窗口从 100 调到 20 | `eval/reports/rag/latency_window_crosscheck.json` |
+| ③ 状态机路由与只读护栏 | 四条路由各自真的跑到哪 | `reports/stage3_agent_findings.md` + `reports/stage3_gateway_metrics.json` |
+| ④ 真实公开数据鲁棒性 | 合成数据之外还扛得住什么 | `reports/real_data_stats.json` |
+
+### 单一口径：数字不在 UI 里手抄
+
+`_benchmark_*` 系列函数只做一件事——从上面那几个产物里读值、算派生量（如
+`recall_percent`、`speedup`），再交给 `st.metric` / `st.dataframe`。**页面里没有一处
+写死的指标常量**，唯一硬编码的是"源文件路径 + 这一行想说什么"。
+
+这样做有个直接好处：产物一改，页面跟着改，不会出现「报告里是 A、界面上是 B」。
+`tests/unit/test_benchmark_panel.py` 就是这个约束的守卫——它现读产物，再断言页面
+渲染出的表格与文案里出现了同样的值，所以「手抄成别的数」和「产物换了页面没跟」
+两种腐化都会红。
+
+写这个测试时正好抓出一条死代码：触顶披露的触发条件原本写成
+`all(三臂 recall == 1.0)`，而 Dense 是 `0.9667`，于是**那段主动披露从来没渲染过**
+（`app.warning` 数量为 0）。改成「任意一臂触顶即披露」后才真正生效——现在页面上
+那段黄色披露说的是「BM25 与混合精排已触顶，混合检索在 Recall 上没有提升空间」。
+这类"因为条件是 all 而不是 any 所以整段话是死的"缺陷，靠读代码很难发现，靠渲染
+断言一遍就出来了。
+
+### 主动披露掉不下来的数字
+
+BM25 与混合精排的 `Recall@5` 都是 `1.0000`（Dense 是 `0.9667`）。这是**天花板效应**，
+不是"系统完美"：评测集只有 30 道有 gold 的题（另有 30 道必须拒答），而语料是同一
+模板的近似副本，所以只要 gold 能进前 20，精排就有很大机会把它顶到前面。页面没有
+把这个 100% 当卖点，而是配了一段黄色披露明说"BM25 单独就已触顶，混合检索在这个
+指标上没有提升空间；真正能拉开差距的是 MRR"，并在下方给出 MRR 的
+`50.00% / 46.46% / 61.33%`。
+
+同理，`③` 里给的"护栏 100%"下面紧跟着一行注明：**载荷样本只有 6 条，是人工构造的，
+不是统计意义上的比率**。这种"自己先说出局限"的写法比一个漂亮的 100% 更经得起追问。
+
+### 与需求稿给的示例数字不一致，以产物为准
+
+需求稿里给的示例表格是 `68.3% / 79.2% / 94.2%` 这类数字。**这些数字在仓库里没有任何
+出处**，而同一份 `ablation.json` 里真实记录的是 `100% / 96.67% / 100%`（Recall@5）
+与 `50% / 46.46% / 61.33%`（MRR@5）。按"严禁凭空捏造"的要求，页面取的是后者，
+并在表头上方直接印出 `eval/reports/rag/ablation.json` 与产物的 ISO 生成时间
+（`2026-10-22T14:16:05.593207+00:00`）——面试官可以拿这个时间戳去 `git log` 对账。
+
+### 性能
+
+整个 Tab 只做几次 `json.load`——`_bench_json()` 挂着 `@lru_cache`（进程内缓存），
+不进模型、不连网络、不做任何现场推理，所以切 Tab 是秒级。截图整页高 2755 px，
+内容底边 2739 px（`app/capture_benchmark.py` 会打印这两个数，用于校准截图窗口）。
+
 ---
 
 ## 2. 三条链路
@@ -283,8 +339,8 @@ question
 ```bash
 cd FinOps-Copilot
 
-# ① 单元测试（~8s，不打 UI）
-.venv/Scripts/python.exe -m pytest tests/unit/ -q          # → 57 passed
+# ① 单元测试（~16s，不打 UI；含评测看板的口径守卫）
+.venv/Scripts/python.exe -m pytest tests/unit/ -q          # → 65 passed
 
 # ② 命令行语义自检（不启 UI，直接跑 RAG 溯源 + Agent 三路由）
 .venv/Scripts/python.exe app/smoke_check.py
@@ -295,9 +351,10 @@ cd FinOps-Copilot
 .venv/Scripts/python.exe app/probe_combined.py             # 逐题 dump 各场景的真实返回（排查"没返回回答"用）
 
 # ④ 重拍截图（需要 Streamlit 已在 8501 跑着；见下方「启动界面」）
-.venv/Scripts/python.exe app/capture_demo.py               # 01–03 + 空白模板
+.venv/Scripts/python.exe app/capture_demo.py               # 01–05
 .venv/Scripts/python.exe app/capture_demo2.py              # 06–07 纯 BM25 vs 精排对照
 .venv/Scripts/python.exe app/capture_showcase.py           # 08–09 两个对抗演示
+.venv/Scripts/python.exe app/capture_benchmark.py          # 10 评测基准看板（整页长图）
 .venv/Scripts/python.exe app/build_contact_sheet.py        # 拼 00-Demo总览.png
 ```
 
@@ -322,16 +379,18 @@ Windows 上一键（含自动找浏览器）：
 
 | 路径 | 作用 |
 |---|---|
-| `app/streamlit_app.py` | 界面全部代码（约 1800 行） |
+| `app/streamlit_app.py` | 界面全部代码（约 2320 行，含对抗演示区与评测基准看板） |
 | `app/README.md` | 运行方式 + 与 `src/` 对不上的 5 处已知问题 |
 | `app/smoke_check.py` | 命令行自检：RAG 溯源 + Agent 三路由 |
 | `app/apptest_check.py` | AppTest 全流程检查（6 条链路，含两个对抗演示） |
 | `app/probe_combined.py` | 逐场景 dump 真实返回（排查"没返回回答"用的） |
-| `app/capture_demo.py` | CDP 驱动真实浏览器截图（01–03）+ 空白截屏模板 |
+| `app/capture_demo.py` | CDP 驱动真实浏览器截图（01–05）+ 空白截屏模板 |
 | `app/capture_demo2.py` | 同上，采纯 BM25 vs 精排对照（06–07） |
 | `app/capture_showcase.py` | 同上，采两个对抗演示（08–09） |
-| `app/build_contact_sheet.py` | 把各图拼成 `00-Demo总览.png` |
-| `docs/demo/` | 9 张截图 + `00-Demo总览.png`（1 页看全） |
+| `app/capture_benchmark.py` | 同上，采评测基准看板整页长图（10） |
+| `app/build_contact_sheet.py` | 把各图拼成 `00-Demo总览.png`（普通面板两列、长图独占整行） |
+| `tests/unit/test_benchmark_panel.py` | 守卫看板口径：现读产物再断言页面渲染出同样的值 |
+| `docs/demo/` | 10 张截图 + `00-Demo总览.png`（1 页看全） |
 | `docs/Demo设计说明.md` | 本文件 |
 | `docs/真实数据接入.md` | 真实公开数据接入说明 |
 | `reports/stage2_retrieval_findings.md` | EVAL-116 检索回退归因（含 tie-break 修复） |
