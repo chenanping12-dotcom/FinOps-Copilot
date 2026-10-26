@@ -62,11 +62,74 @@
 - **场景胶囊点一下 = 填问句 + 立即执行**。合规口径类的问句直接取自
   `eval/datasets/stage1_eval.jsonl` 的真实评测题，不手写、不改写；评测集缺失时
   退回内置问句，保证演示仍然可点。
+- **对抗演示区独立成块，不再混在场景胶囊里**。场景胶囊是「随便点一个看看」，对抗演示是
+  「带着明确结论主张去验证」——两者用途不同，所以分成两个控件。见 §1.1。
 
 两个实现细节：
 
 - **`st.dataframe(width="stretch")` + `hide_index=True`**：命中表把 `排名/溯源引用/方法/分数/Doc_ID/版本` 六列一次列全，不需要展开就能看到"这条来自哪份文档、第几页、哪一版"。
 - **`safe_json_dump()` 包装**（旧名 `_as_json_object`，为兼容既有测试保留别名）：Streamlit 1.66 的 `st.json()` 底层是 `reactJsonViewCompat`，**只接受 JSON 对象**；传 `None` 会被渲染成 `{"ERROR": "Object ... is not valid JSON"}`。Agent 的 `decision` / `trace` / `components` 在 refuse 路由下可能是 `None` 或数组，所以统一走这个包装函数。
+
+---
+
+## 1.1 对抗演示区（本 Demo 的「主张 → 证据」入口）
+
+主区最上方两张**可点击的对抗卡片**。它们不是快捷提问，而是两条已经用真实数据跑出来的
+技术主张。点一下 = 填问句 + 立刻执行 + 在卡片下方回填对照结论。
+
+### 场景 A ｜版本口径冲突对抗（V1 vs V2）
+
+| | 纯词法检索（BM25） | 混合检索 + RRF + Cross-Encoder |
+|---|---|---|
+| Top-1 | `[POL-013-V1, Page 1, Line 10]` | `[POL-013-V2, Page 1, Line 10]` |
+| 版本 | V1 · `effective_from = 2025-01-01` · ❌ **历史已作废** | V2 · `effective_from = 2025-07-01` · ✅ **当前现行** |
+| 口径 | 仅 `completed` 计入营收 | `completed` + `shipped` 计入营收 |
+| 分数 | BM25 52.090974 | rerank 0.999323 |
+
+对照组由**两次真实检索**跑出来（同一问句、同一语料、只换检索档位），不是写死的文案；
+版本状态由 `policy_key` + `effective_from` 现算。这张表要讲的正是：**词法检索会把已经
+作废的旧口径当成答案，而混合检索能把它压下去。**
+
+### 场景 B ｜恶意注入与写操作拦截（Security Guardrails）
+
+测试语句（故意**同时**含中文意图和真实可执行的 DDL）：
+
+```sql
+删除所有已取消的无效订单: DELETE FROM orders WHERE status = 'cancelled';
+```
+
+点击后前端给出企业级红色 403 回执：
+
+```
+[403 FORBIDDEN] 只读策略拦截：检测到非法数据写操作 (DELETE/DROP)
+```
+
+回执里同时列出**实际执行的 SQL = 空**、写权限 = **锁死**、路由 = `refuse`、
+`result = None`（根本没走到查询），以及一条**刻意标红的高亮轨迹**
+`route → refuse`（消息取 `trace[0].raw`，也就是真正命中的关键词）。另外用
+`_dangerous_statement()` 把语句里的 `DELETE FROM…` 片段抽出来单独展示——证明系统
+拦的是**真的 SQL**，不是"看到'删除'两个字就拒绝"。
+
+### 右栏联动（`showcase_focus`）
+
+点任一卡片会写入 `st.session_state["showcase_focus"]`，右栏据此变化：
+
+- 场景 A：右栏顶部插入一张**排序对照明细**（BM25 名次 vs 精排名次 + 名次变化 +
+  两条的版本状态），下面才是常规的合规依据。
+- 场景 B：审计调用链时间线**逐条标红高亮**，让人一眼看到在哪一步被断掉。
+
+手动改问句或点「开始分析」会清掉这个焦点，避免高亮一直挂着。
+
+### 三个实现要点
+
+1. **不重复建检索器**。`run_version_showcase()` 里重建两条基线用的是
+   `build_retriever()`（模型本体来自 `get_embedder/get_reranker`，都挂着
+   `@st.cache_resource`），**不碰** UI 那个 `@st.cache_resource` 的 `get_retriever()`。
+   所以点卡片不会触发第二次全量向量初始化。
+2. **结果容器先建后填**。`showcase_slot = st.container()` 先占位，结果用
+   `with showcase_slot:` 回填，保证「卡片 → 结论」的视觉顺序，而不是结论跑到页面底部。
+3. **refuse 路由不崩**。`trace` 为空、`decision` 为 `None`、`result` 为 `None` 都由
+   `safe_json_dump()` / `_esc()` / `_hit_rows()` 的 None 分支兜住，AppTest 已覆盖。
 
 ---
 
@@ -227,8 +290,15 @@ cd FinOps-Copilot
 .venv/Scripts/python.exe app/smoke_check.py
 
 # ③ AppTest 全流程（模拟点击，~1-3 分钟含首次模型加载）
+#    覆盖 6 条链路：首页 / 切检索模式 / Agent metric / RAG 溯源 / 只读护栏 / 两个对抗演示
 .venv/Scripts/python.exe app/apptest_check.py              # → APPTEST OK
-.venv/Scripts/python.exe app/probe_combined.py             # 逐预设题 dump 两个 Tab 的返回
+.venv/Scripts/python.exe app/probe_combined.py             # 逐题 dump 各场景的真实返回（排查"没返回回答"用）
+
+# ④ 重拍截图（需要 Streamlit 已在 8501 跑着；见下方「启动界面」）
+.venv/Scripts/python.exe app/capture_demo.py               # 01–03 + 空白模板
+.venv/Scripts/python.exe app/capture_demo2.py              # 06–07 纯 BM25 vs 精排对照
+.venv/Scripts/python.exe app/capture_showcase.py           # 08–09 两个对抗演示
+.venv/Scripts/python.exe app/build_contact_sheet.py        # 拼 00-Demo总览.png
 ```
 
 启动界面：
@@ -252,14 +322,16 @@ Windows 上一键（含自动找浏览器）：
 
 | 路径 | 作用 |
 |---|---|
-| `app/streamlit_app.py` | 界面全部代码（748 行） |
+| `app/streamlit_app.py` | 界面全部代码（约 1800 行） |
 | `app/README.md` | 运行方式 + 与 `src/` 对不上的 5 处已知问题 |
 | `app/smoke_check.py` | 命令行自检：RAG 溯源 + Agent 三路由 |
-| `app/apptest_check.py` | AppTest 全流程检查 |
-| `app/probe_combined.py` | 逐预设题 dump 两个 Tab 的返回（排查"没返回回答"用的） |
-| `app/capture_demo.py` | CDP 驱动真实浏览器截图（01–04） |
-| `app/capture_demo2.py` | 同上，采写操作拒绝 + 纯 BM25 对照（05–07） |
-| `docs/demo/` | 7 张截图 + `00-Demo总览.png`（1 页看全） |
+| `app/apptest_check.py` | AppTest 全流程检查（6 条链路，含两个对抗演示） |
+| `app/probe_combined.py` | 逐场景 dump 真实返回（排查"没返回回答"用的） |
+| `app/capture_demo.py` | CDP 驱动真实浏览器截图（01–03）+ 空白截屏模板 |
+| `app/capture_demo2.py` | 同上，采纯 BM25 vs 精排对照（06–07） |
+| `app/capture_showcase.py` | 同上，采两个对抗演示（08–09） |
+| `app/build_contact_sheet.py` | 把各图拼成 `00-Demo总览.png` |
+| `docs/demo/` | 9 张截图 + `00-Demo总览.png`（1 页看全） |
 | `docs/Demo设计说明.md` | 本文件 |
 | `docs/真实数据接入.md` | 真实公开数据接入说明 |
 | `reports/stage2_retrieval_findings.md` | EVAL-116 检索回退归因（含 tie-break 修复） |

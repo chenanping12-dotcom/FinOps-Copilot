@@ -18,7 +18,7 @@
 1. **RAG 混合检索与溯源** — `src/rag/`：字符 bigram BM25（`k1=1.5`、`b=0.75`）与 BGE 双塔（`BAAI/bge-small-zh-v1.5`）双路召回，RRF（`rrf_k=60`）融合后交 `BAAI/bge-reranker-base` Cross-Encoder 精排，输出形如 `[POL-013-V2, Page 1, Line 10]` 的切片级引用（`src/rag/models.py:37`）。`config/rag.yaml` 的 `reranker.candidate_k` 已按下文窗口扫描结论从 100 收到 20。
 2. **LangGraph Agent 与四层只读 SQL 防护** — `src/agent/graph.py` 的图结构为 `route -> (metric | sql | refuse)`、`metric/sql -> _should_retry -> reflect | answer`，自纠错 `max_retries=2`；`src/agent/tools.py` 叠了四层防护：`mode=ro` 连接、`set_authorizer` 回调、表/函数白名单、行数上限 100 + 5,000 万 VM 指令预算（`src/agent/tools.py:9-15` 的模块 docstring 写明「任何单层都可被绕过」）。
 3. **网关主备故障转移与语义缓存** — `src/gateway/app.py` 暴露 `create_app(client, cache)`，路由 `/health`、`/cache/stats`、`/chat`；`src/gateway/client.py` 只在首个 token 之前故障转移，4xx（非 429）快速失败，客户端断开立即停止重试，语义缓存必须带相似度阈值。
-4. **可交互 Demo（企业级三栏工作台）** — `app/streamlit_app.py`：左栏是引擎配置与系统监控（引擎/护栏指示灯、检索档位、网关语义缓存命中率），中栏是业务决策看板（核心结论 + 路由/工具/行数/耗时 + 业务指标，命中写操作或 PII 时整块换成红色安全护栏横幅），右栏是证据链与审计（合规依据原文 + `[DOC_ID] · Page · Line` 溯源徽标 + 版本口径比对 + 审计调用链时间线 + 实际执行的只读 SQL）。API 没起也会自拉一个本地 demo 网关（8010 端口），**没有 LLM Key 也能演示**。
+4. **可交互 Demo（企业级三栏工作台）** — `app/streamlit_app.py`：左栏是引擎配置与系统监控（引擎/护栏指示灯、检索档位、网关语义缓存命中率），中栏是业务决策看板（核心结论 + 路由/工具/行数/耗时 + 业务指标，命中写操作或 PII 时整块换成红色安全护栏横幅），右栏是证据链与审计（合规依据原文 + `[DOC_ID] · Page · Line` 溯源徽标 + 版本口径比对 + 审计调用链时间线 + 实际执行的只读 SQL）。主区顶部还有**对抗演示区**：一张卡片用同一问句跑两种检索策略，现场比出「BM25 命中已废止的 V1 / 精排命中现行的 V2」；另一张卡片把真正的 `DELETE` 语句送进状态机，看它在哪个节点被拦下。API 没起也会自拉一个本地 demo 网关（8010 端口），**没有 LLM Key 也能演示**。
 5. **容器化部署** — `Dockerfile` 单镜像双角色（API 8000 / UI 8501），依赖层与代码层分离，非 root（uid/gid 1001）运行；`docker-compose.yml` 用 healthcheck + `depends_on: service_healthy` 编排启动顺序。
 6. **真实数据接入** — `scripts/ingest_real_data.py` 下载 UCI Online Retail II，规范化到项目的 14 列契约并建 `data/processed/real_orders.db`；**不读写、不覆盖 Stage 1 的任何产物**。
 
@@ -28,15 +28,18 @@
 
 ![Demo 总览](docs/demo/00-Demo总览.png)
 
-七个画面分别对应：① 首页（三栏工作台：左配置监控 / 中业务决策 / 右证据链）、
+九个画面分别对应：① 首页（三栏工作台：左配置监控 / 中业务决策 / 右证据链）、
 ② 合规依据（命中生效口径原文，带 `[DOC_ID] · Page · Line` 溯源徽标与相关性）、
 ③ 证据链（切片元数据 + 同页父块原文）、④ 业务决策（`metric` 路由 + 业务指标看板 +
 实际执行的只读 SQL）、⑤ 安全护栏（问「删掉所有订单」→ `refuse` 路由，不产出任何写 SQL）、
 ⑥⑦ 同一问题的纯 BM25 与混合+精排排序对照（BM25 把已废止的 `POL-013-V1` 排在首位，
-精排把现行生效的 `POL-013-V2` 提到首位）。
+精排把现行生效的 `POL-013-V2` 提到首位）、
+⑧⑨ **对抗演示区**：⑧ 同一问句下 V1（已废止）与 V2（现行）并排，附两种策略耗时与
+「现行口径是否置顶」结论；⑨ 把一条真正的 `DELETE FROM orders …` 当业务问题提交，
+前端给出 403 回执、右栏 `route` / `refuse` 两个节点高亮，且不产出任何 SQL。
 
-截图与采集脚本见 `app/capture_demo.py`、`app/capture_demo2.py`、`app/build_contact_sheet.py`
-（通过 Chrome DevTools Protocol 驱动真实浏览器点击，不是手工摆拍）。
+截图与采集脚本见 `app/capture_demo.py`、`app/capture_demo2.py`、`app/capture_showcase.py`、
+`app/build_contact_sheet.py`（通过 Chrome DevTools Protocol 驱动真实浏览器点击，不是手工摆拍）。
 
 **这个 Demo 的完整设计说明见 [`docs/Demo设计说明.md`](docs/Demo设计说明.md)** ——
 包含界面结构、三条链路的数据流、九个刻意的设计决策（含"为什么不接大模型"）、

@@ -3,12 +3,13 @@
 用法（在 FinOps-Copilot 目录下）：
     .venv/Scripts/python.exe app/apptest_check.py
 
-覆盖四条链路：
-1. 首页渲染（三栏工作台 + 侧边栏状态灯）；
+覆盖六条链路：
+1. 首页渲染（三栏工作台 + 对抗演示双卡片 + 侧边栏状态灯）；
 2. 侧边栏切检索模式 -> bm25；
 3. 经营指标问句 -> Agent 走 metric 路由并出结论；
 4. 合规口径问句 -> RAG 出命中 + Top-1 生效口径；
-5. 写操作问句 -> 命中只读护栏，route=refuse。
+5. 写操作问句 -> 命中只读护栏，route=refuse；
+6. 对抗演示 A/B -> 版本漂移对照（BM25 命中 V1、精排命中 V2）+ DELETE 语句被拦。
 
 断言全程 ``AppTest.exception`` 为空、答案/命中非空。
 首次运行要真实加载检索器（约 1-3 分钟）。
@@ -94,9 +95,40 @@ def main() -> int:
     if guard_state.route != "refuse":
         raise SystemExit(f"APPTEST FAILED: 写操作未被拦截，route={guard_state.route}")
 
+    # ---- 对抗演示 A：版本口径冲突（V1 vs V2）------------------------------
+    find_button(app, "showcase_version_drift").click().run()
+    check(app, "对抗演示 A（版本口径冲突）")
+    duel = app.session_state["showcase_result"]["version"]
+    bm25_top = duel["bm25"]["hits"][0].chunk
+    hybrid_top = duel["hybrid"]["hits"][0].chunk
+    status = duel["status"]
+    print(
+        f"  对抗A: 纯 BM25 Top-1={bm25_top.citation_label}"
+        f"({status.get(str(bm25_top.chunk_id))}) | 混合+精排 Top-1="
+        f"{hybrid_top.citation_label}({status.get(str(hybrid_top.chunk_id))})"
+    )
+    if status.get(str(bm25_top.chunk_id)) != "已废止":
+        raise SystemExit("APPTEST FAILED: 纯 BM25 的 Top-1 不是已废止版本")
+    if status.get(str(hybrid_top.chunk_id)) != "现行":
+        raise SystemExit("APPTEST FAILED: 混合+精排的 Top-1 不是现行版本")
+    if app.session_state["showcase_focus"] != "version_drift":
+        raise SystemExit("APPTEST FAILED: 场景 A 未设置右栏高亮焦点")
+
+    # ---- 对抗演示 B：恶意注入与写操作拦截 ---------------------------------
+    find_button(app, "showcase_guardrail").click().run()
+    check(app, "对抗演示 B（恶意注入与写操作拦截）")
+    bad_state = app.session_state["agent_result"]["state"]
+    print(f"  对抗B: route={bad_state.route} | reason={bad_state.route_reason}")
+    if bad_state.route != "refuse":
+        raise SystemExit(f"APPTEST FAILED: DELETE 语句未被拦截，route={bad_state.route}")
+    if bad_state.result is not None:
+        raise SystemExit("APPTEST FAILED: 被拦截的请求不应产生查询结果")
+    if app.session_state["showcase_focus"] != "guardrail":
+        raise SystemExit("APPTEST FAILED: 场景 B 未设置右栏高亮焦点")
+
     if app.warning:
         print(f"  页面 warning: {[w.value for w in app.warning]}")
-    print("\nAPPTEST OK: UI 全程无异常，Agent / RAG / 安全护栏三条链路都符合预期")
+    print("\nAPPTEST OK: UI 全程无异常，Agent / RAG / 安全护栏 / 两个对抗演示都符合预期")
     return 0
 
 

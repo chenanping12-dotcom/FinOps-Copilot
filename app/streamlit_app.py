@@ -78,6 +78,37 @@ METRIC_EXAMPLES = [
     "删掉所有订单",
 ]
 
+# 对抗演示里的恶意语句：这是一条**真的**写操作 SQL，不是「删掉所有订单」这种口语。
+# 故意保留完整语句形态，用来演示「路由器在工具之前就把它拦下」。
+SHOWCASE_DELETE_QUESTION = (
+    "删除所有已取消的无效订单: DELETE FROM orders WHERE status = 'cancelled';"
+)
+
+# 面试对抗演示的两个场景。卡片上展示的问句与实际提交的字符串必须同源，
+# 否则面试官点了卡片却看到另一句话，演示当场穿帮。
+SHOWCASE_SCENARIOS: dict[str, dict[str, Any]] = {
+    "version_drift": {
+        "title": "版本口径冲突对抗",
+        "tag": "V1 vs V2",
+        "question": FALLBACK_RAG_QUESTION,
+        "blurb": (
+            "同一份语料、同一个问句，只换检索策略。纯词法检索把已废止的旧口径排在首位；"
+            "混合检索 + RRF 融合 + Cross-Encoder 精排把现行生效的口径提上来。"
+        ),
+        "kind": "rag",
+    },
+    "guardrail": {
+        "title": "恶意注入与写操作拦截",
+        "tag": "403 FORBIDDEN",
+        "question": SHOWCASE_DELETE_QUESTION,
+        "blurb": (
+            "把一条真正的 DELETE 语句当成业务问题提交。意图路由器在工具之前就拦下它，"
+            "只读连接与 AST 校验根本不会看到写操作。"
+        ),
+        "kind": "guardrail",
+    },
+}
+
 
 # ==========================================================================
 # 一、视觉层
@@ -285,6 +316,94 @@ div[data-testid="stMetric"] {
   border: 1px solid var(--fops-border); border-radius: var(--fops-radius);
 }
 div[data-testid="stMetricLabel"] p { font-size: 0.7rem !important; color: var(--fops-muted) !important; }
+
+/* ---------- 对抗演示：双场景卡片 ---------- */
+.fops-shot {
+  height: 100%; padding: 13px 15px; border-radius: var(--fops-radius-lg);
+  background: linear-gradient(160deg, rgba(59, 130, 246, 0.10) 0%, rgba(11, 18, 32, 0.35) 72%);
+  border: 1px solid rgba(59, 130, 246, 0.30);
+}
+.fops-shot.is-danger {
+  background: linear-gradient(160deg, rgba(239, 68, 68, 0.13) 0%, rgba(11, 18, 32, 0.35) 72%);
+  border-color: rgba(239, 68, 68, 0.38);
+}
+.fops-shot-head { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+.fops-shot-title { font-size: 0.97rem; font-weight: 750; color: #dbeafe; }
+.fops-shot.is-danger .fops-shot-title { color: #fecaca; }
+.fops-shot-tag {
+  padding: 2px 9px; font-family: var(--fops-mono); font-size: 0.68rem; font-weight: 700;
+  border-radius: 999px; color: #bfdbfe;
+  background: var(--fops-blue-soft); border: 1px solid rgba(59, 130, 246, 0.45);
+}
+.fops-shot.is-danger .fops-shot-tag {
+  color: #fee2e2; background: rgba(239, 68, 68, 0.22); border-color: rgba(239, 68, 68, 0.5);
+}
+.fops-shot-blurb { margin-top: 8px; color: var(--fops-muted); font-size: 0.83rem; line-height: 1.66; }
+.fops-shot-q {
+  margin-top: 9px; padding: 8px 10px; font-family: var(--fops-mono); font-size: 0.77rem;
+  color: var(--fops-text); background: rgba(2, 6, 23, 0.55);
+  border: 1px solid var(--fops-border); border-radius: 6px; word-break: break-all;
+}
+
+/* ---------- 对抗演示：V1 vs V2 左右对照 ---------- */
+.fops-versus { display: flex; gap: 12px; align-items: stretch; flex-wrap: wrap; margin: 4px 0 10px 0; }
+.fops-versus-col {
+  flex: 1 1 240px; min-width: 210px; padding: 12px 14px;
+  border-radius: var(--fops-radius); border: 1px solid var(--fops-border);
+  background: var(--fops-panel);
+}
+.fops-versus-col.is-bad { border-color: rgba(239, 68, 68, 0.45); background: rgba(127, 29, 29, 0.16); }
+.fops-versus-col.is-ok  { border-color: rgba(34, 197, 94, 0.45); background: rgba(6, 78, 59, 0.18); }
+.fops-versus-head {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--fops-muted);
+}
+.fops-versus-verdict { margin-top: 7px; font-size: 0.93rem; font-weight: 750; }
+.fops-versus-col.is-bad .fops-versus-verdict { color: #fca5a5; }
+.fops-versus-col.is-ok  .fops-versus-verdict { color: #86efac; }
+.fops-versus-cite { margin-top: 7px; font-family: var(--fops-mono); font-size: 0.79rem; color: #bfdbfe; }
+.fops-versus-meta { margin-top: 5px; font-family: var(--fops-mono); font-size: 0.73rem;
+                    color: var(--fops-muted); line-height: 1.6; }
+.fops-versus-text { margin-top: 9px; font-size: 0.84rem; line-height: 1.7; color: var(--fops-text); }
+
+/* ---------- 对抗演示：403 拦截回执 ---------- */
+.fops-403 {
+  margin: 6px 0 12px 0; padding: 13px 15px; border-radius: var(--fops-radius);
+  background: rgba(2, 6, 23, 0.62); border: 1px solid rgba(239, 68, 68, 0.45);
+}
+.fops-403-head { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+.fops-403-code {
+  font-family: var(--fops-mono); font-size: 0.84rem; font-weight: 800;
+  color: #fecaca; letter-spacing: 0.04em;
+}
+.fops-403-stmt {
+  margin-top: 9px; padding: 9px 11px; font-family: var(--fops-mono); font-size: 0.79rem;
+  color: #fecaca; background: rgba(127, 29, 29, 0.28);
+  border: 1px dashed rgba(239, 68, 68, 0.5); border-radius: 6px; word-break: break-all;
+}
+.fops-403-line { margin-top: 8px; color: var(--fops-muted); font-size: 0.8rem; line-height: 1.68; }
+.fops-403-line code {
+  font-family: var(--fops-mono); font-size: 0.76rem; color: #bfdbfe;
+  background: var(--fops-blue-soft); padding: 1px 5px; border-radius: 4px;
+}
+
+/* ---------- Trace 节点高亮（对抗演示联动） ---------- */
+.fops-tl-item.is-hl {
+  background: rgba(59, 130, 246, 0.10);
+  border-left-color: var(--fops-blue);
+  border-radius: 0 6px 6px 0;
+}
+.fops-tl-item.is-hl::before {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.35), 0 0 12px rgba(59, 130, 246, 0.8);
+}
+.fops-tl-item.is-hl .fops-tl-node {
+  background: rgba(59, 130, 246, 0.28); border-color: rgba(59, 130, 246, 0.6);
+}
+.fops-hl-note {
+  margin: 2px 0 9px 0; padding: 7px 10px; border-radius: 6px;
+  background: rgba(59, 130, 246, 0.10); border: 1px solid rgba(59, 130, 246, 0.32);
+  color: #bfdbfe; font-size: 0.79rem; line-height: 1.62;
+}
 </style>"""
 
 
@@ -384,25 +503,83 @@ def _status_bar(engine_state: bool | None, engine_text: str, guard_text: str) ->
     )
 
 
-def _guardrail_banner(reason: str) -> str:
-    """写操作 / PII 被拦截时的红色安全护栏横幅。"""
-    return (
-        '<div class="fops-guard">'
+_DANGEROUS_SQL_RE = re.compile(
+    r"\b(delete|drop|truncate|alter|update|insert)\b[^;]*", re.IGNORECASE
+)
+
+
+def _dangerous_statement(question: str) -> tuple[str, str]:
+    """从问句里挑出被拦截的语句与命中的危险操作符。
+
+    只认 SQL 形态的写操作（``DELETE`` / ``DROP`` / …）；口语化的「删掉所有订单」
+    匹配不到，此时退回整句 + 通用文案——两种情况下横幅都要能正常渲染。
+    """
+    match = _DANGEROUS_SQL_RE.search(str(question or ""))
+    if not match:
+        return str(question or "").strip(), "数据修改类关键词"
+    return match.group(0).strip(), match.group(1).upper()
+
+
+def _guardrail_banner(reason: str, question: str = "") -> str:
+    """写操作 / PII 被拦截时的红色安全护栏横幅。
+
+    问句里带真实 SQL 写操作时（对抗演示场景 B），横幅额外给出 ``[403 FORBIDDEN]``
+    回执与**被拦截的那条语句**，让「到底拦了什么」可以被肉眼复核，而不是只有一句
+    「已拦截」。
+    """
+    statement, operation = _dangerous_statement(question)
+    tag = "Read-only Policy Enforced" if operation == "数据修改类关键词" else f"Blocked · {operation}"
+    head = (
         '<div class="fops-guard-head">'
         '<span class="fops-guard-icon">&#9940;</span>'
-        '<span class="fops-guard-title">Security Guardrail Intercepted</span>'
-        '<span class="fops-guard-tag">Read-only Policy Enforced</span>'
+        '<span class="fops-403-code">[403 FORBIDDEN]</span>'
+        '<span class="fops-guard-title">只读策略拦截</span>'
+        f'<span class="fops-guard-tag">{_esc(tag)}</span>'
         "</div>"
-        f'<div class="fops-guard-body">请求已被只读安全护栏拦截，未对数据进行任何写操作。'
+    )
+    body = (
+        '<div class="fops-guard-body">请求已被只读安全护栏拦截，未对数据进行任何写操作。'
         f"拦截依据：{_esc(reason or '命中只读策略，拒绝执行')}</div>"
+    )
+    if statement:
+        body += (
+            f'<div class="fops-403-stmt">{_esc(statement)}</div>'
+            '<div class="fops-403-line">该语句在<b>意图路由</b>阶段即被拦下，'
+            "没有进入 <code>SafeSQLTool</code> —— 因此不会有任何 SQL 到达数据库。</div>"
+        )
+    return '<div class="fops-guard">' + head + body + "</div>"
+
+
+def _forbidden_receipt(question: str, reason: str) -> str:
+    """对抗演示场景 B 的「拦截回执」：被拦语句 + 四层防护清单。"""
+    statement, operation = _dangerous_statement(question)
+    return (
+        '<div class="fops-403">'
+        '<div class="fops-403-head">'
+        '<span class="fops-403-code">[403 FORBIDDEN]</span>'
+        f'<span class="fops-guard-tag">只读策略拦截 · {_esc(operation)}</span>'
+        "</div>"
+        f'<div class="fops-403-stmt">{_esc(statement)}</div>'
+        '<div class="fops-403-line">'
+        "写权限被锁死在四个层次上：<code>mode=ro</code> 只读连接 · "
+        "<code>set_authorizer</code> 回调 · 表/函数白名单 · 行数上限与 VM 指令预算。"
+        "任何单层都可能被绕过，所以是叠加而不是单选。"
+        "</div>"
+        f'<div class="fops-403-line">本轮的实际拦截点：<b>意图路由器</b>（'
+        f"{_esc(reason or '命中只读策略，拒绝执行')}）。写操作连工具的入口都没到。</div>"
         "</div>"
     )
 
 
-def _timeline_html(steps: list[dict[str, Any]]) -> str:
-    """把 ``state.trace`` 渲染成审计调用链时间线。"""
+def _timeline_html(steps: list[dict[str, Any]], highlight: Any = None) -> str:
+    """把 ``state.trace`` 渲染成审计调用链时间线。
+
+    ``highlight`` 是节点名集合：对抗演示跑完后用它把关键节点（如 ``refuse``）
+    点亮，默认 ``None`` 时行为与之前完全一致。
+    """
     if not steps:
         return '<div class="fops-tl-detail">本次未产生调用链记录。</div>'
+    lit = {str(node) for node in (highlight or [])}
     items: list[str] = []
     for step in steps:
         node = str(step.get("node", "?"))
@@ -412,6 +589,8 @@ def _timeline_html(steps: list[dict[str, Any]]) -> str:
             state_class = " is-ok"
         elif step.get("ok") is False or step.get("error"):
             state_class = " is-bad"
+        if node in lit:
+            state_class += " is-hl"
         items.append(
             f'<div class="fops-tl-item{state_class}">'
             f'<span class="fops-tl-node">{_esc(node)}</span>'
@@ -443,6 +622,53 @@ def _trace_detail(step: dict[str, Any]) -> str:
     if rest:
         return json.dumps(rest, ensure_ascii=False, default=str)[:200]
     return json.dumps(step, ensure_ascii=False, default=str)[:200]
+
+
+def _version_status_map(*hit_lists: Any) -> dict[str, str]:
+    """跨多次检索结果，为每个 ``chunk_id`` 判定「现行 / 已废止」。
+
+    判定口径与 :func:`_version_comparison` 保持一致：同一 ``policy_key`` 下
+    ``effective_from`` 最大的版本是现行口径。之所以要跨多次检索的结果一起算，
+    是因为对抗演示里单看一次 BM25 的 Top-5 可能根本不包含 V2，那样就无法判断
+    V1 是不是旧的——把两次命中的并集拿来比才稳。
+    """
+    newest: dict[str, str] = {}
+    for hits in hit_lists:
+        for hit in hits or []:
+            chunk = hit.chunk
+            key = str(getattr(chunk, "policy_key", "") or "")
+            effective = str(getattr(chunk, "effective_from", "") or "")
+            if key and effective > newest.get(key, ""):
+                newest[key] = effective
+
+    status: dict[str, str] = {}
+    for hits in hit_lists:
+        for hit in hits or []:
+            chunk = hit.chunk
+            key = str(getattr(chunk, "policy_key", "") or "")
+            effective = str(getattr(chunk, "effective_from", "") or "")
+            is_current = bool(key) and bool(effective) and effective == newest.get(key)
+            status[str(chunk.chunk_id)] = "现行" if is_current else "已废止"
+    return status
+
+
+def _versus_column(label: str, hit: Any, status: str, extra: str = "") -> str:
+    """版本对抗里的一列：策略名 + ✅/❌ 判定 + 溯源徽标 + 该策略返回的原文。"""
+    chunk = hit.chunk
+    is_current = status == "现行"
+    css_class = "is-ok" if is_current else "is-bad"
+    verdict = "&#9989; 当前现行口径" if is_current else "&#10060; 历史已作废口径"
+    return (
+        f'<div class="fops-versus-col {css_class}">'
+        f'<div class="fops-versus-head">{_esc(label)}</div>'
+        f'<div class="fops-versus-verdict">{verdict}</div>'
+        f'<div class="fops-versus-cite">{_esc(chunk.citation_label)}</div>'
+        f'<div class="fops-versus-meta">版本 {_esc(chunk.version)} ｜ '
+        f'effective_from {_esc(getattr(chunk, "effective_from", "") or "—")} ｜ '
+        f'method {_esc(hit.method)} ｜ score {float(hit.score):.4f}{_esc(extra)}</div>'
+        f'<div class="fops-versus-text">{_esc(chunk.text)}</div>'
+        "</div>"
+    )
 
 
 # ==========================================================================
@@ -878,6 +1104,56 @@ def ensure_agent_result() -> dict[str, Any] | None:
 
 
 # ==========================================================================
+# 七之二、对抗演示：场景 A 的双策略对照执行
+# ==========================================================================
+def run_version_showcase(question: str, top_k: int) -> dict[str, Any]:
+    """同一问句分别跑纯 BM25 与混合检索+精排，返回可左右对照的两组命中。
+
+    复用 ``get_retriever`` 的缓存实例：一次点击只多花一次检索的时间（BM25 毫秒级、
+    精排半秒级），**不会重新加载模型**，也不会重建向量索引。
+    """
+    retriever, load_seconds = get_retriever(_config_mtime())
+    bm25_hits, bm25_elapsed = run_retrieval(retriever, question, "bm25", int(top_k))
+    hybrid_hits, hybrid_elapsed = run_retrieval(retriever, question, "hybrid_rerank", int(top_k))
+    return {
+        "question": question,
+        "load_seconds": load_seconds,
+        "bm25": {"hits": bm25_hits, "elapsed": bm25_elapsed},
+        "hybrid": {"hits": hybrid_hits, "elapsed": hybrid_elapsed},
+        "status": _version_status_map(bm25_hits, hybrid_hits),
+        "error": None,
+    }
+
+
+def ensure_showcase() -> dict[str, Any] | None:
+    """按 ``showcase_request`` 执行对抗演示（结果按 nonce 缓存在 session_state）。
+
+    场景 B（护栏拦截）不需要额外计算：Agent 那一轮已经产出了 ``route=refuse`` 与
+    trace，这里只负责记住焦点，供右栏把对应节点点亮。
+    """
+    request = st.session_state.get("showcase_request")
+    if request is None:
+        return None
+    cached = st.session_state.get("showcase_result")
+    if cached is not None and cached.get("nonce") == request["nonce"]:
+        return cached
+
+    payload: dict[str, Any] = {
+        "nonce": request["nonce"],
+        "focus": request["focus"],
+        "question": request["question"],
+    }
+    if request["focus"] == "version_drift":
+        try:
+            with st.spinner("对抗演示：同一问句分别跑 纯 BM25 与 混合检索+精排 …"):
+                payload["version"] = run_version_showcase(request["question"], request["top_k"])
+        except Exception as exc:  # 模型缺失 / 离线都收敛成降级提示，不抛栈
+            payload["error"] = f"{type(exc).__name__}: {exc}"
+    st.session_state["showcase_result"] = payload
+    return payload
+
+
+# ==========================================================================
 # 八、侧边栏：引擎配置与系统监控
 # ==========================================================================
 def _gateway_controls(scope: str) -> None:
@@ -1000,6 +1276,134 @@ def _header() -> None:
     )
 
 
+def _showcase_cards() -> str | None:
+    """两张高亮的对抗演示卡片。返回**本次新点击**的场景键，重复 rerun 不会重触发。"""
+    _section("核心能力实测 · 对抗演示")
+    columns = st.columns(2, gap="medium")
+    picked: str | None = None
+    for column, (key, spec) in zip(columns, SHOWCASE_SCENARIOS.items()):
+        danger = spec["kind"] == "guardrail"
+        css_class = "fops-shot is-danger" if danger else "fops-shot"
+        with column:
+            st.markdown(
+                f'<div class="{css_class}">'
+                '<div class="fops-shot-head">'
+                f'<span class="fops-shot-title">{_esc(spec["title"])}</span>'
+                f'<span class="fops-shot-tag">{_esc(spec["tag"])}</span>'
+                "</div>"
+                f'<div class="fops-shot-blurb">{_esc(spec["blurb"])}</div>'
+                f'<div class="fops-shot-q">{_esc(spec["question"])}</div>'
+                "</div>",
+                unsafe_allow_html=True,
+            )
+            if st.button(f"▶ 运行：{spec['title']}", key=f"showcase_{key}", width="stretch"):
+                picked = key
+    return picked
+
+
+def _hit_rows(label: str, hits: list[Any], status: dict[str, str]) -> list[dict[str, Any]]:
+    """把一组命中压成对比表用的行（两条策略共用同一套列）。"""
+    return [
+        {
+            "策略": label,
+            "排名": hit.rank,
+            "溯源引用": hit.chunk.citation_label,
+            "版本": hit.chunk.version,
+            "生效日期": getattr(hit.chunk, "effective_from", "") or "—",
+            "版本状态": status.get(str(hit.chunk.chunk_id), ""),
+            "方法": hit.method,
+            "分数": round(float(hit.score), 4),
+        }
+        for hit in hits
+    ]
+
+
+def _render_version_duel(payload: dict[str, Any]) -> None:
+    """场景 A 的左右对照：纯词法基线 vs 混合检索 + Cross-Encoder。"""
+    bm25_pack = payload.get("bm25") or {}
+    hybrid_pack = payload.get("hybrid") or {}
+    bm25_hits = list(bm25_pack.get("hits") or [])
+    hybrid_hits = list(hybrid_pack.get("hits") or [])
+    status = payload.get("status") or {}
+    if not bm25_hits or not hybrid_hits:
+        st.warning("对抗演示未取到足够命中，无法对比（请确认规则库已生成）。")
+        return
+
+    top_bm25, top_hybrid = bm25_hits[0], hybrid_hits[0]
+    bm25_status = status.get(str(top_bm25.chunk.chunk_id), "")
+    hybrid_status = status.get(str(top_hybrid.chunk.chunk_id), "")
+
+    st.markdown(
+        '<div class="fops-versus">'
+        + _versus_column("纯 BM25（词法基线）", top_bm25, bm25_status)
+        + _versus_column("混合检索 + RRF + Cross-Encoder", top_hybrid, hybrid_status)
+        + "</div>",
+        unsafe_allow_html=True,
+    )
+
+    if bm25_status == "已废止" and hybrid_status == "现行":
+        st.success(
+            "**对抗结论**：同一份语料、同一个问句，只换了检索策略。纯词法检索把"
+            f"已废止的 `{top_bm25.chunk.citation_label}` 排在首位（这就是口径漂移）；"
+            "混合检索 + RRF 融合 + Cross-Encoder 精排把现行生效的"
+            f" `{top_hybrid.chunk.citation_label}` 提到首位。"
+        )
+    else:
+        st.info(
+            f"本轮两个策略的 Top-1 分别是 `{top_bm25.chunk.citation_label}`（{bm25_status}）"
+            f" 与 `{top_hybrid.chunk.citation_label}`（{hybrid_status}）。"
+        )
+
+    duel_cols = st.columns(4)
+    duel_cols[0].metric("BM25 检索耗时", f"{float(bm25_pack.get('elapsed', 0.0)) * 1000:.1f} ms")
+    duel_cols[1].metric("混合+精排耗时", f"{float(hybrid_pack.get('elapsed', 0.0)) * 1000:.0f} ms")
+    duel_cols[2].metric("Top-1 版本", f"{top_bm25.chunk.version} → {top_hybrid.chunk.version}")
+    duel_cols[3].metric("现行口径是否置顶", "是" if hybrid_status == "现行" else "否")
+
+    with st.expander("两条策略的完整排序（逐条对照）", expanded=False):
+        st.dataframe(
+            _hit_rows("纯 BM25", bm25_hits, status)
+            + _hit_rows("混合 + 精排", hybrid_hits, status),
+            hide_index=True,
+            width="stretch",
+        )
+        st.caption(
+            f"检索器一次性加载耗时 {float(payload.get('load_seconds', 0.0)):.1f}s，"
+            "之后每次点击都复用同一个缓存实例，不会重新加载模型。"
+        )
+
+
+def _render_showcase_result() -> None:
+    """在对抗卡片下方回填本轮结果（由 ``main`` 在同一容器内二次进入渲染）。"""
+    result = st.session_state.get("showcase_result")
+    if result is None:
+        st.caption(
+            "点上面任意一张卡片即可现场跑一遍：场景 A 会同时用两种检索策略回答同一个问题，"
+            "场景 B 会把一条真正的 DELETE 语句送进状态机，看它在哪里被拦下。"
+        )
+        return
+    if result.get("error"):
+        st.error(f"对抗演示未完成：{result['error']}")
+        return
+
+    if result.get("focus") == "version_drift":
+        version = result.get("version")
+        if version:
+            _render_version_duel(version)
+        return
+
+    agent_payload = st.session_state.get("agent_result") or {}
+    state = agent_payload.get("state")
+    reason = getattr(state, "route_reason", "") if state is not None else ""
+    st.markdown(
+        _forbidden_receipt(str(result.get("question", "")), reason),
+        unsafe_allow_html=True,
+    )
+    st.caption(
+        "被拦下的写操作不会产生任何 SQL；右栏「审计调用链」里的 route / refuse 两个节点已高亮。"
+    )
+
+
 def _scenario_bar(catalog: dict[str, dict[str, Any]]) -> str | None:
     """业务场景快选。返回**本次新选中**的场景键，重复 rerun 不会重复触发。"""
     keys = list(catalog)
@@ -1100,7 +1504,13 @@ def _decision_panel(agent_payload: dict[str, Any] | None, rag_payload: dict[str,
 
     # --- 安全护栏：写操作 / PII 被拦截 -------------------------------------
     if route == "refuse":
-        st.markdown(_guardrail_banner(getattr(state, "route_reason", "") or ""), unsafe_allow_html=True)
+        st.markdown(
+            _guardrail_banner(
+                getattr(state, "route_reason", "") or "",
+                str(agent_payload.get("question", "")),
+            ),
+            unsafe_allow_html=True,
+        )
         _card(
             "响应结论",
             f'<div class="fops-conclusion">{_esc(getattr(state, "answer", "") or "请求已被拒绝。")}</div>',
@@ -1184,8 +1594,17 @@ def _evidence_panel(rag_payload: dict[str, Any] | None, agent_payload: dict[str,
     """右栏：合规依据 + 版本口径比对 + 审计调用链。"""
     _section("证据链与审计")
 
+    # 对抗演示跑完后，把焦点对应的那一块点亮；普通提问时 focus 为 None，行为不变。
+    focus = st.session_state.get("showcase_focus")
+
     # ---------------- 合规依据 ----------------
     st.markdown("**合规依据**")
+    if focus == "version_drift":
+        st.markdown(
+            '<div class="fops-hl-note">对抗演示焦点：这里给出的是<b>现行生效</b>口径。'
+            "同样的问题把侧边栏切到「纯 BM25」再跑一次，Top-1 会变成已废止的旧版本。</div>",
+            unsafe_allow_html=True,
+        )
     if rag_payload is None:
         st.markdown(
             '<div class="fops-evidence">'
@@ -1257,11 +1676,24 @@ def _evidence_panel(rag_payload: dict[str, Any] | None, agent_payload: dict[str,
 
     state = agent_payload["state"]
     trace = list(getattr(state, "trace", None) or [])
-    st.markdown(_timeline_html(trace), unsafe_allow_html=True)
+    if focus == "guardrail":
+        st.markdown(
+            '<div class="fops-hl-note">对抗演示焦点：<b>route / refuse</b> 两个节点已高亮。'
+            "写操作在路由节点就被拦下，因此这条链路上不会出现任何 SQL。</div>",
+            unsafe_allow_html=True,
+        )
+    st.markdown(
+        _timeline_html(trace, {"route", "refuse"} if focus == "guardrail" else None),
+        unsafe_allow_html=True,
+    )
 
     result = getattr(state, "result", None)
     checklist = st.columns(3)
-    checklist[0].metric("AST 校验", "通过" if (result is not None and getattr(result, "ok", False)) else "未执行")
+    checklist[0].metric(
+        "AST 校验",
+        "通过" if (result is not None and getattr(result, "ok", False)) else "跳过",
+        help="请求在意图路由阶段就被护栏拦下时不会产生任何 SQL，因此没有可校验的语句。",
+    )
     checklist[1].metric("重试次数", _safe(getattr(state, "retries", 0), "0"))
     checklist[2].metric("执行耗时", f"{agent_payload.get('elapsed', 0.0):.2f}s")
 
@@ -1297,21 +1729,49 @@ def main() -> None:
 
     _header()
 
+    # 面试对抗演示区：卡片先渲染，结果稍后回填进同一个容器，保持「卡片 → 对照结论」
+    # 的视觉顺序（Streamlit 的容器支持创建后再写入，位置仍是创建处）。
+    showcase_slot = st.container()
+    with showcase_slot:
+        showcase_picked = _showcase_cards()
+
     # 场景快选：点了就把问句填进输入框并立刻执行（与手动点「开始分析」等价）。
     picked = _scenario_bar(catalog)
     if picked:
         st.session_state["question"] = catalog[picked]["question"]
 
+    if showcase_picked:
+        spec = SHOWCASE_SCENARIOS[showcase_picked]
+        st.session_state["question"] = spec["question"]
+        st.session_state["showcase_focus"] = showcase_picked
+        st.session_state["showcase_request"] = {
+            "focus": showcase_picked,
+            "question": spec["question"],
+            "top_k": int(top_k),
+            "nonce": time.time(),
+        }
+    elif picked:
+        # 点场景快选也退出对抗焦点，避免右栏高亮一直挂着。
+        st.session_state.pop("showcase_focus", None)
+
     question, clicked = _ask_row()
 
-    should_run = clicked or bool(picked)
+    if clicked:
+        # 手动点「开始分析」同样退出对抗焦点。
+        st.session_state.pop("showcase_focus", None)
+
+    should_run = clicked or bool(picked) or bool(showcase_picked)
     if should_run and question.strip():
         _submit(question.strip(), mode, top_k)
 
     # 执行（结果按 nonce 缓存在 session_state，重复 rerun 不会重算）。
     rag_payload = ensure_rag_result()
     agent_payload = ensure_agent_result()
+    ensure_showcase()
     _render_status_slot(status_slot, rag_payload, agent_payload)
+
+    with showcase_slot:
+        _render_showcase_result()
 
     # 三栏工作台的主区与证据抽屉。
     decision_col, evidence_col = st.columns([1.55, 1], gap="large")

@@ -61,16 +61,31 @@ class Chrome:
         )
 
     def wait_ready(self, timeout: float = 40.0) -> str:
+        """返回**应用页面**的 CDP WebSocket。
+
+        坑：Chrome 启动时除 APP_URL 外还会带一个 ``about:blank`` 标签页，``/json``
+        里它常常排在最前面。早先直接取第一个 ``type == "page"`` 会连到那个空白页，
+        于是所有 DOM 查询都返回空、每次点击都报「找不到元素」。这里改成按 URL 认
+        页面，空白页只作兜底。
+        """
         deadline = time.time() + timeout
+        fallback: str | None = None
         while time.time() < deadline:
             try:
                 tabs = requests.get(f"http://127.0.0.1:{CDP_PORT}/json", timeout=2).json()
                 for tab in tabs:
-                    if tab.get("type") == "page" and tab.get("webSocketDebuggerUrl"):
+                    if tab.get("type") != "page" or not tab.get("webSocketDebuggerUrl"):
+                        continue
+                    url = tab.get("url", "")
+                    if url.startswith(APP_URL.rstrip("/")):
                         return tab["webSocketDebuggerUrl"]
+                    if url and url != "about:blank" and fallback is None:
+                        fallback = tab["webSocketDebuggerUrl"]
             except Exception:
                 pass
             time.sleep(0.5)
+        if fallback:
+            return fallback
         raise RuntimeError("CDP 未就绪")
 
     def close(self) -> None:
