@@ -133,6 +133,22 @@ QUESTION_VALUE = """
 HAS_TABLE = "document.querySelectorAll('[data-testid=\"stDataFrame\"]').length"
 BODY_TEXT = "document.body.innerText"
 
+# Streamlit 的 expander 是 <details>/<summary>，不是 button，
+# 所以 CLICK_BY_TEXT 点不开它，必须单独处理（否则「溯源明细展开」这张图是假的）。
+EXPAND_HIT_1 = """
+(() => {
+  const dets = [...document.querySelectorAll('details')];
+  const d = dets.find(x => (x.innerText || '').includes('#1 ·'));
+  if (!d || !d.querySelector('summary')) return false;
+  d.querySelector('summary').scrollIntoView({block: 'center'});
+  d.querySelector('summary').click();
+  return true;
+})()
+"""
+HIT_1_OPEN = """
+[...document.querySelectorAll('details')].some(d => (d.innerText || '').includes('#1 ·') && d.open)
+"""
+
 
 async def main() -> int:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -176,7 +192,8 @@ async def main() -> int:
             await s.shot("02-RAG检索结果.png")
 
             print("[4/6] 展开第 1 条溯源明细 ...")
-            print("    已展开:", await s.js(CLICK_BY_TEXT % json.dumps("#1 ·")))
+            print("    已点:", await s.js(EXPAND_HIT_1))
+            print("    已展开:", await s.wait_for(HIT_1_OPEN, timeout=30, label="第1条展开"))
             await asyncio.sleep(3)
             await s.shot("03-溯源明细展开.png")
 

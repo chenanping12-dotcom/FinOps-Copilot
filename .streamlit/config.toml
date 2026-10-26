@@ -1,0 +1,17 @@
+# Streamlit 运行配置。
+#
+# 为什么把主题写进仓库：这个 Demo 的视觉层（app/streamlit_app.py 里的 CSS）是按
+# 「深空灰底 + 企业蓝点缀」设计的。如果浏览器/系统是浅色主题，Streamlit 的原生
+# 组件（dataframe、metric、expander、代码块）会渲染成浅底深字，跟自定义 CSS
+# 打架，同一份代码在不同机器上不是一个样子。
+#
+# 把 base 钉成 dark、主色钉成企业蓝，任何机器上打开都是同一个视觉。
+[theme]
+base = "dark"
+primaryColor = "#3b82f6"
+backgroundColor = "#0b1220"
+secondaryBackgroundColor = "#111a2e"
+textColor = "#e2e8f0"
+
+[browser]
+gatherUsageStats = false

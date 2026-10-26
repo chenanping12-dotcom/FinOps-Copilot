@@ -23,7 +23,10 @@ CLICK_BY_TEXT = """
   const want = %s;
   const nodes = [...document.querySelectorAll('button, [role="tab"], label')];
   const hit = nodes.find(b => (b.innerText || '').replace(/\\s+/g, ' ').trim().includes(want));
-  if (!hit) return false;
+  if (!hit) {
+    const seen = nodes.map(b => (b.innerText || '').trim()).filter(Boolean).slice(0, 24).join(' | ');
+    return '未找到「' + want + '」；页面上的按钮: ' + seen;
+  }
   hit.scrollIntoView({block: 'center'});
   hit.click();
   return true;
