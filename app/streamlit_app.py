@@ -1765,6 +1765,9 @@ def _evidence_panel(rag_payload: dict[str, Any] | None, agent_payload: dict[str,
 # ③ **产物缺失就降级**：宁可显示「未找到产物」，也绝不用硬编码的漂亮数字顶替。
 # --------------------------------------------------------------------------
 ABLATION_JSON = ROOT / "eval" / "reports" / "rag" / "ablation.json"
+PROBE_EVAL116_JSON = ROOT / "eval" / "reports" / "rag" / "probe_eval116.json"
+RANKINGS_JSONL = ROOT / "eval" / "reports" / "rag" / "rankings.jsonl"
+STAGE1_MANIFEST_JSON = ROOT / "reports" / "stage1_manifest.json"
 LATENCY_CROSSCHECK_JSON = ROOT / "eval" / "reports" / "rag" / "latency_window_crosscheck.json"
 REAL_STATS_JSON = ROOT / "reports" / "real_data_stats.json"
 REAL_COMPARISON_JSON = ROOT / "reports" / "real_data_comparison.json"
@@ -1856,16 +1859,86 @@ def _bench_verdict(body_html: str) -> None:
     st.markdown(f'<div class="fops-bench-verdict">{body_html}</div>', unsafe_allow_html=True)
 
 
+def _probe_eval116() -> dict:
+    """窗口 100 下 EVAL-116 的 Cross-Encoder 分值探针产物。"""
+    return _bench_json(str(PROBE_EVAL116_JSON)) or {}
+
+
+def _lexical_similarity(payload: dict) -> str:
+    """近似副本与 gold 的**词面**相似度区间：直读 lexical_context[].similarity_to_gold。
+
+    注意别和 _score_spread 混用——那个读的是 Cross-Encoder 的**重排分值**。
+    两个量在这份产物里差一个数量级（0.93 vs 0.99），标错一个词就是另一个故事了。
+    """
+    values = [
+        float(item["similarity_to_gold"])
+        for item in (payload.get("lexical_context") or [])
+        if item.get("similarity_to_gold") is not None
+    ]
+    if not values:
+        return "—"
+    return f"{min(values):.4f}–{max(values):.4f}（{len(values)} 个近似副本）"
+
+
+def _score_spread(payload: dict) -> str:
+    """100 条候选的重排分值分布：区间、极差、不同分值个数——全从探针产物算。"""
+    scores = [
+        float(item["rerank_score"])
+        for item in (payload.get("cross_encoder_scores") or [])
+        if item.get("rerank_score") is not None
+    ]
+    if not scores:
+        return "—"
+    return (
+        f"{min(scores):.4f}–{max(scores):.4f}"
+        f"（{len(scores)} 条候选的极差只有 {max(scores) - min(scores):.4f}）"
+        f"、不同分值仅 {len(set(scores))} 个"
+    )
+
+
+def _rule_documents() -> str:
+    """规则文档份数：直读 stage1_manifest.json 的 summary，取不到显示 —。"""
+    payload = _bench_json(str(STAGE1_MANIFEST_JSON)) or {}
+    value = (payload.get("summary") or {}).get("rule_documents")
+    return f"{int(value):,}" if isinstance(value, (int, float)) else "—"
+
+
+def _gold_rank(question_id: str, arm: str) -> int | None:
+    """现行 rankings.jsonl 里某题某臂的 gold 名次；查不到返回 None，不猜。"""
+    if not RANKINGS_JSONL.exists():
+        return None
+    try:
+        for line in RANKINGS_JSONL.read_text(encoding="utf-8").splitlines():
+            record = json.loads(line)
+            if record.get("question_id") != question_id or record.get("arm") != arm:
+                continue
+            gold = set(record.get("gold_chunk_ids") or [])
+            for index, chunk_id in enumerate(
+                record.get("ranked_chunk_ids") or [], start=1
+            ):
+                if chunk_id in gold:
+                    return index
+            return None
+    except (OSError, ValueError):
+        return None
+    return None
+
+
 def _bench_retrieval() -> None:
-    """① 120 题离线检索消融：三臂 Recall / MRR / 耗时，全部直读 ablation.json。"""
-    _section("① 离线检索基准 · 120 题全量消融")
+    """① 离线检索消融：三臂 Recall / MRR / 耗时，全部直读 ablation.json。"""
+    payload = _bench_json(str(ABLATION_JSON))
+    if not payload:
+        return
+    questions = payload.get("questions_evaluated")
+    _section(
+        f"① 离线检索基准 · {int(questions)} 题全量消融"
+        if isinstance(questions, (int, float))
+        else "① 离线检索基准 · 全量消融"
+    )
     st.markdown(
         _bench_src_line(ABLATION_JSON, "真实 BGE 模型现场推理，非估算"),
         unsafe_allow_html=True,
     )
-    payload = _bench_json(str(ABLATION_JSON))
-    if not payload:
-        return
 
     metrics = payload.get("metrics") or {}
     latency = payload.get("avg_latency_ms") or {}
@@ -1913,8 +1986,11 @@ def _bench_retrieval() -> None:
             for a in BENCH_ARM_ORDER
             if a != "hybrid_rerank"
         )
+        ceiling_value = max(
+            float((metrics.get(a) or {}).get("recall_at_5") or 0.0) for a in ceiling_arms
+        )
         _bench_note(
-            f"<b>主动披露：{_esc(names)} 的 Recall@5 已经触顶（1.0000），"
+            f"<b>主动披露：{_esc(names)} 的 Recall@5 已经触顶（{ceiling_value:.4f}），"
             f"混合检索在这个指标上没有提升空间</b>——这份合成语料对「召回」不具区分度。"
             f"所以结论必须收敛到 <b>MRR@5</b>：它是唯一有信息量的指标，"
             f"且确实分出了差异（混合精排 {_bench_pct(hybrid_mrr)}，"
@@ -1922,10 +1998,13 @@ def _bench_retrieval() -> None:
         )
         avg_rank = (1.0 / float(hybrid_mrr)) if hybrid_mrr else None
         rank_txt = f"约第 {avg_rank:.1f} 位" if avg_rank else "—"
+        probe = _probe_eval116()
         _bench_verdict(
             f"MRR 绝对值 {_bench_pct(hybrid_mrr)} 意味着 gold 平均落在{rank_txt}，仍有余量。"
-            "根因是<b>语料模板化</b>：250 份规则文档由模板生成，同一条款的 V1/V2 只差一个范围从句，"
-            "文本相似度 0.9368–0.9468，100 条候选挤在 0.0034 的分数区间里、只有 52 个不同分值——"
+            f"根因是<b>语料模板化</b>：{_rule_documents()} 份规则文档由模板生成，"
+            "同一条款的 V1/V2 只差一个范围从句，"
+            f"EVAL-116 的近似副本与 gold 词面相似度高达 {_lexical_similarity(probe)}，"
+            f"重排分值 {_score_spread(probe)}——"
             "Cross-Encoder 被打到饱和，名次由平局规则决定。"
             "这是<b>评测集本身的缺陷，不是检索链路的缺陷</b>；重造语料会推翻全部历史指标，"
             "所以标成 <code>TODO(HUMAN)</code> 留档而没有自行动手。"
@@ -1957,7 +2036,11 @@ def _bench_retrieval() -> None:
 
 
 def _bench_latency_window() -> None:
-    """精排窗口 100 → 20 的耗时对照：这是简历里「3450 ms → 715 ms」的出处。"""
+    """精排窗口 100 → 20 的耗时对照：简历里那组「窗口调优」数字的出处。
+
+数值一律从 latency_window_crosscheck.json 现算，不写进 docstring
+（写进去就会变成一个没人负责的、随时会过期的副本）。
+"""
     payload = _bench_json(str(LATENCY_CROSSCHECK_JSON))
     if not payload:
         return
@@ -1986,10 +2069,21 @@ def _bench_latency_window() -> None:
             ("加速比", f"{wide / narrow:.1f}×", "单题平均墙钟时间"),
         ]
     )
+    probe = _probe_eval116()
+    rank_wide = probe.get("gold_rerank_rank")
+    rank_now = _gold_rank("EVAL-116", "hybrid_rerank")
+    recall_now = (
+        ((_bench_json(str(ABLATION_JSON)) or {}).get("metrics") or {})
+        .get("hybrid_rerank", {})
+        .get("recall_at_5")
+    )
+    recall_txt = f"{float(recall_now):.4f}" if isinstance(recall_now, (int, float)) else "—"
     _bench_verdict(
         "窗口收到 20 是那次「Hybrid 反而低于纯 BM25」的<b>主因修复</b>：近似副本不再进入候选，"
-        "gold 从第 8 位回到第 4 位、Recall@5 恢复 1.0000；把平局规则由 <code>chunk_id</code> "
-        "字典序改为回退 RRF 共识分数是配套动作，有效但不彻底。"
+        f"EVAL-116 的 gold 从窗口 100 下的第 "
+        f"{rank_wide if rank_wide is not None else '—'} 位回到现行第 "
+        f"{rank_now if rank_now is not None else '—'} 位、Recall@5 恢复 {recall_txt}；"
+        "把平局规则由 <code>chunk_id</code> 字典序改为回退 RRF 共识分数是配套动作，有效但不彻底。"
         "<b>因果顺序不能写反</b>——窗口是主因，tie-break 是配套。"
     )
 
@@ -2045,9 +2139,17 @@ def _bench_agent_and_gateway() -> None:
         hide_index=True,
         width="stretch",
     )
+    layers: dict[str, int] = {}
+    for _load, _layer, _err in READONLY_PAYLOADS:
+        layers[_layer] = layers.get(_layer, 0) + 1
+    layer_txt = "、".join(
+        f"{name} {n} 条" for name, n in sorted(layers.items(), key=lambda kv: -kv[1])
+    )
+    # 不写死「5 条注入 / 1 条越权」那种凭印象的分法：按实际拦下的层做直方图，
+    # 层名本身就在上面那张表里逐条可见，对得上账。
     _bench_verdict(
-        "6 条载荷全部被拒（其中 5 条为注入类，1 条为访问未授权表）。"
-        "这里刻意<b>不写「拦截率 100%」</b>：载荷是人工挑的 6 条，"
+        f"{len(READONLY_PAYLOADS)} 条载荷全部被拒；按实际拦下的那一层分布：{layer_txt}。"
+        f"这里刻意<b>不写「拦截率 100%」</b>：载荷是人工挑的 {len(READONLY_PAYLOADS)} 条，"
         "报百分比会把小样本包装成统计结论。"
     )
 
@@ -2080,6 +2182,60 @@ def _bench_agent_and_gateway() -> None:
     )
 
 
+def _bench_class(comparison: dict, name: str) -> dict:
+    """按类名取一个脏数据类；取不到返回空 dict，宁可显示 — 也不猜值。"""
+    for item in comparison.get("classes") or []:
+        if str(item.get("class")) == name:
+            return item
+    return {}
+
+
+def _pct_rows(item: dict) -> str:
+    """把一个脏数据类渲染成「占比%（N 行）」。
+
+    小数位刻意与上面「真实数据占比」那一列保持一致——同一个量在同一个面板里
+    出现两种精度，看起来就像两个来源。
+    """
+    pct, rows = item.get("real_pct"), item.get("real_rows")
+    if pct is None or rows is None:
+        return "—"
+    return f"{float(pct):.2f}%（{int(rows):,} 行）"
+
+
+def _identity_failures(stats: dict) -> str:
+    """跨系统金额恒等式的失败行数：直读产物字段，取不到就明说取不到。"""
+    value = (
+        ((stats.get("project_caliber") or {}).get("cross_check_sqlite") or {}).get(
+            "rows_where_paid_minus_refunded_ne_quantity_x_price"
+        )
+    )
+    return f"{int(value):,} 行" if isinstance(value, (int, float)) else "—"
+
+
+def _injected_anomalies(stats: dict) -> str:
+    """合成集注入的异常规模：直读 injected_anomalies，不手抄「六类各 500」。"""
+    injected = (stats.get("synthetic_baseline") or {}).get("injected_anomalies") or {}
+    by_type = injected.get("by_type") or {}
+    values = [int(v or 0) for v in by_type.values()]
+    if not values:
+        return "见产物 reports/real_data_stats.json"
+    total = f"{int(injected.get('total') or sum(values)):,}"
+    if len(set(values)) == 1:
+        return f"{len(values)} 类异常各注入 {values[0]:,} 条，共 {total} 条"
+    return f"{len(values)} 类异常共注入 {total} 条"
+
+
+def _archive_note(stats: dict) -> str:
+    """原始压缩包的字节数与 SHA-256 前缀：直读 stats.download，不手抄尺寸。"""
+    download = stats.get("download") or {}
+    size, sha = download.get("bytes"), download.get("sha256")
+    if not isinstance(size, (int, float)):
+        return "原始压缩包与 SHA-256 见产物"
+    if sha:
+        return f"原始压缩包 {int(size):,} B，SHA-256 {str(sha)[:12]}… 已校验"
+    return f"原始压缩包 {int(size):,} B"
+
+
 def _bench_real_data() -> None:
     """④ 真实公开数据鲁棒性：合成 vs 真实的脏数据结构差异，直读 real_data_*.json。"""
     comparison = _bench_json(str(REAL_COMPARISON_JSON))
@@ -2091,7 +2247,7 @@ def _bench_real_data() -> None:
     st.markdown(
         _bench_src_line(
             REAL_STATS_JSON,
-            "原始压缩包 45,622,418 B，SHA-256 已校验",
+            _archive_note(stats),
         ),
         unsafe_allow_html=True,
     )
@@ -2105,7 +2261,7 @@ def _bench_real_data() -> None:
             (
                 "合成数据规模",
                 f"{int(comparison.get('rows_synthetic') or 0):,} 单",
-                "六类异常各注入 500 条，共 3,000 条",
+                _injected_anomalies(stats),
             ),
             (
                 "无法落进契约类型的行",
@@ -2114,7 +2270,7 @@ def _bench_real_data() -> None:
             ),
             (
                 "金额恒等式失败行",
-                "0 行",
+                _identity_failures(stats),
                 "paid − refunded == quantity × unit_price",
             ),
         ]
@@ -2159,13 +2315,17 @@ def _bench_real_data() -> None:
     st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
 
     duplicate = comparison.get("exact_duplicate_composition") or {}
+    missing_customer = _bench_class(comparison, "缺失 customer/Customer ID")
+    exact_dup = _bench_class(comparison, "完全重复行")
+    cancelled = _bench_class(comparison, "InvoiceNo 以 C 开头（取消单）")
     _bench_note(
         f"<b>合成数据均匀得不真实，真实数据才是压力的来源</b>：合成集里客户号缺失、"
         f"单价为 0/负、取消单前缀、完全重复行<b>全是 0</b>；真实集里客户号缺失 "
-        f"<b>{(comparison.get('classes') or [{}])[0].get('real_pct', '—')}%</b>（243,007 行）、"
-        f"完全重复行 3.217%（34,337 行）、取消单前缀 1.83%（19,494 行）。"
+        f"<b>{_pct_rows(missing_customer)}</b>、"
+        f"完全重复行 {_pct_rows(exact_dup)}、取消单前缀 {_pct_rows(cancelled)}。"
         f"重复行组成经拆解为「同一发票内重录」（{int(duplicate.get('repeat_groups_within_one_invoice') or 0):,} 组、"
-        f"跨发票 0 行、单张发票最多重复 {duplicate.get('max_repeats_in_one_invoice', '—')} 次），"
+        f"跨发票 {int(duplicate.get('rows_spanning_multiple_invoices') or 0):,} 行、"
+        f"单张发票最多重复 {duplicate.get('max_repeats_in_one_invoice', '—')} 次），"
         "去重会删掉合法记录，因此<b>全部保留</b>。"
     )
 
@@ -2174,17 +2334,25 @@ def _bench_real_data() -> None:
     revenue = (
         (caliber.get('{"metric": "revenue"}') or {}).get("rows") or [{}]
     )[0].get("revenue_yuan")
+    dropped = normalization.get("rows_dropped_untypeable")
+    dropped_txt = f"{int(dropped):,}" if isinstance(dropped, (int, float)) else "—"
+    breakdown = normalization.get("dropped_breakdown") or {}
+    breakdown_all_zero = bool(breakdown) and all(
+        int(v or 0) == 0 for v in breakdown.values()
+    )
     _bench_verdict(
         "<b>两条「不静默篡改」的工程红线</b>："
-        "① 落不进契约类型的行严格丢弃并计数（本次 <code>0</code> 行，"
-        "<code>dropped_breakdown</code> 三类全 0），"
+        f"① 落不进契约类型的行严格丢弃并计数（本次 <code>{dropped_txt}</code> 行，"
+        f"<code>dropped_breakdown</code> 三类{'全 0' if breakdown_all_zero else '见产物'}），"
         "而不是拿默认值糊过去——糊过去就是在篡改财务金额；"
         "② 跨系统交叉验证 <code>paid − refunded == quantity × unit_price</code> 失败行 "
-        "<b>0 行</b>，GBP 浮点先 <code>round(x*100)</code> 再入整数分，无精度漂移。"
+        f"<b>{_identity_failures(stats)}</b>，"
+        "GBP 浮点先 <code>round(x*100)</code> 再入整数分，无精度漂移。"
         f"真实数据上按项目口径跑出的净营收为 <b>{float(revenue):,.2f}</b> 元"
         if revenue is not None
-        else "<b>两条「不静默篡改」的工程红线</b>：落不进契约类型的行严格丢弃并计数；"
-        "跨系统金额恒等式失败行为 0。",
+        else "<b>两条「不静默篡改」的工程红线</b>："
+        f"落不进契约类型的行严格丢弃并计数（本次 {dropped_txt} 行）；"
+        f"跨系统金额恒等式失败行为 {_identity_failures(stats)}。",
     )
     _bench_note(
         "<b>真实源的结构性限制，主动写清楚</b>："

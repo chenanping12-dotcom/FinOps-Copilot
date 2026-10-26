@@ -14,7 +14,9 @@
 
 from __future__ import annotations
 
+import ast
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -29,6 +31,7 @@ from streamlit.testing.v1 import AppTest  # noqa: E402
 ABLATION = ROOT / "eval" / "reports" / "rag" / "ablation.json"
 REAL_STATS = ROOT / "reports" / "real_data_stats.json"
 GATEWAY_METRICS = ROOT / "reports" / "stage3_gateway_metrics.json"
+PROBE = ROOT / "eval" / "reports" / "rag" / "probe_eval116.json"
 
 ARMS = ("bm25", "dense", "hybrid_rerank")
 ARM_HINT = {"bm25": "BM25", "dense": "Dense", "hybrid_rerank": "Cross-Encoder"}
@@ -165,3 +168,105 @@ def test_契约外行数必须写明是零而不是悄悄填充(app: AppTest, ma
     assert dropped == 0
     assert "无法落进契约类型的行" in markdown_text, "缺少「不静默篡改」的说明"
     assert "严格丢弃并计数" in markdown_text or "绝不静默填充" in markdown_text
+
+
+# --------------------------------------------------------------------------
+# 反向守卫：展示层不许再出现「手抄的数据数字」
+# --------------------------------------------------------------------------
+BENCH_RENDER_FUNCS = {
+    "_bench_src_line",
+    "_bench_kpis",
+    "_bench_note",
+    "_bench_verdict",
+    "_bench_retrieval",
+    "_bench_latency_window",
+    "_bench_state_machine",
+    "_bench_real_data",
+    "_render_benchmark",
+    "_pct_rows",
+    "_injected_anomalies",
+    "_identity_failures",
+    "_archive_note",
+    "_score_spread",
+    "_rule_documents",
+    "_gold_rank",
+}
+
+DATA_NUMBER = (
+    re.compile(r"\d{1,3}(?:,\d{3})+"),            # 千分位：243,007
+    re.compile(r"\d+(?:\.\d+)?\s*%"),             # 百分比：3.217%
+    re.compile(r"\d+\.\d{2,}"),                   # 精确小数：0.9368
+    re.compile(r"\d+\s*(?:ms|条|行|题|单|次)"),   # 带单位：3450 ms
+)
+
+# 允许保留的：键为「函数名:命中串」，值为理由。目前为空——所有数据数字都应直读产物。
+ALLOWED_HANDWRITTEN: dict[str, str] = {}
+
+
+def _rendered_string_literals() -> list[tuple[int, str, str]]:
+    """扫出看板渲染路径里的字符串常量（跳过 docstring），连同命中的裸数字。"""
+    tree = ast.parse((ROOT / "app" / "streamlit_app.py").read_text(encoding="utf-8"))
+    hits: list[tuple[int, str, str]] = []
+    for fn in [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.FunctionDef) and node.name in BENCH_RENDER_FUNCS
+    ]:
+        doc = ast.get_docstring(fn, clean=False)
+        for node in ast.walk(fn):
+            if not (isinstance(node, ast.Constant) and isinstance(node.value, str)):
+                continue
+            if doc is not None and node.value == doc:
+                continue
+            for pattern in DATA_NUMBER:
+                for match in pattern.finditer(node.value):
+                    hits.append((node.lineno, fn.name, match.group(0).strip()))
+    return hits
+
+
+def test_展示层不得再出现手抄的数据数字() -> None:
+    """任何「看起来是实验结果」的数字，都必须来自产物，不能是字符串常量。
+
+    本项目实际踩过这个坑（所以单独测它）：
+      * KPI 卡片写死 `"0 行"`，同一个列表里的兄弟卡片却是直读的；
+      * 正文写死 `243,007 行` / `3.217%（34,337 行）` / `1.83%（19,494 行）`；
+      * 正文写死 `0.9964–0.9999`（重排分值）——它同时**错标成了「文本相似度」**，
+        而产物里 `lexical_context[].similarity_to_gold` 才是文本相似度（0.9368–0.9468）。
+        两个量差一个数量级，混用就是把结论说反，见下一个测试。
+
+    数字一旦抄进字符串，产物更新后就没人会发现它已经过期，面试官拿去对账就会翻车。
+    这个测试是「棘轮」：新增的手抄数字必须先进 ALLOWED_HANDWRITTEN 并写明理由。
+    """
+    hits = [
+        hit
+        for hit in _rendered_string_literals()
+        if f"{hit[1]}:{hit[2]}" not in ALLOWED_HANDWRITTEN
+    ]
+    assert not hits, (
+        "看板渲染路径里出现了手抄的数据数字（应改为从产物直读）：\n"
+        + "\n".join(f"  L{lineno} {name}()  「{hit}」" for lineno, name, hit in sorted(hits))
+    )
+
+def test_词面相似度与重排分值不得混为一谈(app: AppTest, markdown_text: str) -> None:
+    """EVAL-116 那段里有两个量，差一个数量级，标错一个词结论就反了。
+
+      * `lexical_context[].similarity_to_gold` → **词面**相似度（0.93 量级）
+      * `cross_encoder_scores[].rerank_score`  → **重排**分值（0.99 量级）
+
+    本项目实际踩过：把重排分值的区间当成「文本相似度」写进正文。所以这里要求
+    页面**同时**渲染两个量，且各自对得上产物——只写一个就说明它们又被合并了。
+    """
+    probe = _load(PROBE)
+    lexical = [float(item["similarity_to_gold"]) for item in probe["lexical_context"]]
+    rerank = [float(item["rerank_score"]) for item in probe["cross_encoder_scores"]]
+    assert lexical and rerank, "产物结构变了，本测试的前提要跟着改"
+    assert max(lexical) < min(rerank), (
+        "两个量本该差一个数量级；若产物真的变了，请先确认语义再改这个断言"
+    )
+
+    assert f"{min(lexical):.4f}–{max(lexical):.4f}" in markdown_text, (
+        "词面相似度区间没有按产物渲染（lexical_context[].similarity_to_gold）"
+    )
+    assert f"{min(rerank):.4f}–{max(rerank):.4f}" in markdown_text, (
+        "重排分值区间没有按产物渲染（cross_encoder_scores[].rerank_score）"
+    )

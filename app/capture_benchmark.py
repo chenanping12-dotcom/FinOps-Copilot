@@ -27,7 +27,7 @@ from capture_demo import BODY_TEXT, OUT_DIR, Chrome, Session  # noqa: E402
 TAB_LABEL = "评测基准与鲁棒性"
 # 视口高度按内容实测来定（脚本会打印实测值）。注意不能用 scrollHeight 当内容高度：
 # 窗口比内容高时 scrollHeight 就等于视口高，会误判成「页面很高」而截出一大块空白。
-WINDOW = os.environ.get("BENCH_WINDOW", "1600,2850")
+WINDOW = os.environ.get("BENCH_WINDOW", "1600,2940")
 
 CLICK_TAB = """
 (() => {
@@ -107,7 +107,8 @@ async def main() -> int:
             print("[4/4] 截图 ...")
             path = await s.shot("10-评测基准看板.png")
             text = await s.js(BODY_TEXT)
-            (OUT_DIR / "页面文本-评测看板.txt").write_text(text, encoding="utf-8")
+            # 页面文本只打印不落盘：它每次截图都会变（耗时/时间戳），
+            # 留下来只会在 git 里制造噪声，真正要守的口径由 pytest 断言。
             print(f"    页面文本 {len(text)} 字")
             print("    产出:", path)
     finally:
