@@ -419,6 +419,19 @@ def _render_rag_result(hits: list[Any], elapsed: float, mode: str, query: str) -
     if not hits:
         st.warning("没有命中任何切片。")
         return
+
+    # 顶部先给「回答依据」：精排后的第 1 条规则原文。
+    # 本 Demo 不接大模型，所以这里是**抽取式**的回答——直接把规则切片原文摆出来，
+    # 不做生成式改写，因此不存在口径幻觉；每一句都能在下面点开溯源核对。
+    top = hits[0]
+    st.markdown("**回答依据（检索到的规则原文）**")
+    st.success(f"`{top.chunk.citation_label}`\n\n{top.chunk.text}")
+    st.caption(
+        "本 Demo 不调用大模型：上面是**规则切片原文**，未经生成式改写，所以不会编口径。"
+        "想让它换成人话复述，把 `src/gateway/` 的 LLMClient 接上任意一家 API 即可，检索这一层不用动。"
+    )
+
+    st.markdown(f"**其余 {len(hits)} 条命中（按精排分数排序）**")
     st.dataframe(
         [
             {
@@ -475,6 +488,11 @@ def _as_json_object(value: Any) -> Any:
     return {"value": value}
 
 
+# 平台规则/口径类问题的特征词。本 Tab 是经营指标 Agent，遇到这类问题它会按固定口径
+# 给出**数字**（不是规则原文），很容易被误读成「答非所问」，所以显式提示一句。
+POLICY_HINTS = ("口径", "规则", "条款", "生效", "政策", "规定", "适用", "可以计入", "能否")
+
+
 def _render_agent_result(state: Any, elapsed: float) -> None:
     st.markdown("**最终答案**")
     st.success(state.answer or "（无答案）")
@@ -486,6 +504,13 @@ def _render_agent_result(state: Any, elapsed: float) -> None:
     cols[2].metric("返回行数", len(result.rows) if result else 0)
     cols[3].metric("重试次数", state.retries)
     cols[4].metric("耗时", f"{elapsed:.2f}s")
+
+    if any(hint in (state.question or "") for hint in POLICY_HINTS):
+        st.info(
+            "这看起来是**平台规则 / 口径**类问题。本 Tab 是经营指标 Agent，它按固定口径给出的是"
+            "**实际数字**，不是规则原文。要规则原文，请看左边「📚 知识库问答（RAG）」Tab 的"
+            "「回答依据」块。"
+        )
 
     st.caption(f"路由理由：{state.route_reason or '—'}")
     if state.error:
@@ -523,9 +548,10 @@ def _sidebar(rag_config: dict[str, Any]) -> tuple[str, int]:
             options=list(RETRIEVAL_MODES),
             format_func=lambda key: RETRIEVAL_MODES[key],
             index=0,
+            key="mode",
             help="现场对比混合检索与纯 BM25 / 纯向量的差异。",
         )
-        top_k = st.slider("返回条数 top_k", min_value=1, max_value=10, value=5)
+        top_k = st.slider("返回条数 top_k", min_value=1, max_value=10, value=5, key="top_k")
 
         st.divider()
         st.header("网关语义缓存")
@@ -595,13 +621,24 @@ def _header(rag_config: dict[str, Any]) -> None:
 
 
 def _set_question(value: str) -> None:
-    """预设问题按钮的回调。
+    """预设问题按钮的回调：填问题 **并且直接开跑**。
 
     必须在 on_click 回调里写 session_state：Streamlit 禁止在组件实例化之后再修改
     该组件的 session_state key，而按钮渲染发生在 text_input 之后，所以不能用
     ``if st.button(...): st.session_state["question"] = ...``。
+
+    这里顺带把 rag_request / agent_request 一起写好——实测很多人点完预设题
+    以为已经出结果了，其实只是把文字填进了输入框，于是以为「Demo 不返回回答」。
     """
     st.session_state["question"] = value
+    nonce = time.time()
+    st.session_state["rag_request"] = {
+        "query": value,
+        "mode": st.session_state.get("mode", "hybrid_rerank"),
+        "top_k": int(st.session_state.get("top_k", 5)),
+        "nonce": nonce,
+    }
+    st.session_state["agent_request"] = {"question": value, "nonce": nonce}
 
 
 def _question_area() -> str:
@@ -656,7 +693,11 @@ def main() -> None:
             request = {"query": question.strip(), "mode": mode, "top_k": top_k, "nonce": time.time()}
             st.session_state["rag_request"] = request
         if request is None:
-            st.info("先在下方输入问题（或用上方预设问题按钮），再点「开始分析」或「仅运行检索」。")
+            st.info(
+                "还没跑过。三种开始方式：① 点上面的**知识库预设问题**（点了就直接跑）；"
+                "② 在输入框里手打问题后点「开始分析」；③ 只跑检索点本 Tab 的「仅运行检索」。"
+                "⚠️ 在输入框里按回车**不会**触发运行，必须点按钮。"
+            )
         else:
             config_mtime = str(CONFIG_PATH.stat().st_mtime_ns)
             retriever, load_seconds = get_retriever(config_mtime)
@@ -681,7 +722,11 @@ def main() -> None:
             request = {"question": question.strip(), "nonce": time.time()}
             st.session_state["agent_request"] = request
         if request is None:
-            st.info("输入一个经营指标问题（如「各品类净营收是多少？」），再点「开始分析」或「仅运行 Agent」。")
+            st.info(
+                "还没跑过。三种开始方式：① 点上面的**经营指标预设问题**（点了就直接跑）；"
+                "② 在输入框里手打问题后点「开始分析」；③ 只跑 Agent 点本 Tab 的「仅运行 Agent」。"
+                "⚠️ 在输入框里按回车**不会**触发运行，必须点按钮。"
+            )
         else:
             agent = get_agent(str(ORDERS_DB.stat().st_mtime_ns))
             st.caption(
