@@ -27,7 +27,7 @@
 ```
 ┌─ 侧边栏（引擎配置与监控）─┬─ 主区 ────────────────────────────────────────────────┐
 │ ● Engine  Online          │ [FC] FinOps Copilot                                   │
-│ ● AST Guardrail  Active   │      企业经营分析与合规审计控制台                      │
+│ ● Read-only Guard Active  │      企业经营分析与合规审计控制台                      │
 │ (st.empty 占位，跑完回填) │                                                       │
 │                           │ 业务场景胶囊：退款确认口径 / 数码退货窗口 /            │
 │ 检索策略                  │              品类净营收 / 支付渠道分布 / 护栏拦截测试  │
@@ -38,7 +38,7 @@
 │                           │ │ 路由/工具/行数/耗时   │ 版本口径比对（现行/已废止）  ││
 │ 返回条数 Top-K [1-10]     │ │ 业务指标看板          │ 其余命中表 + 逐条溯源明细    ││
 │                           │ │ 完整结论 / 返回数据表 │ 审计调用链时间线            ││
-│ 语义网关                  │ │                      │ AST 校验 / 重试 / 只读 SQL   ││
+│ 语义网关                  │ │                      │ 只读护栏 / 重试 / 只读 SQL   ││
 │  网关地址 [127.0.0.1:8000]│ └──────────────────────┴──────────────────────────────┘│
 │  [启动本地网关][刷新统计] │                                                       │
 │  [预热语义缓存]           │ 演示数据与规则文档为本地合成样本，非真实平台政策。      │
@@ -49,7 +49,7 @@
 四层设计意图：
 
 - **左栏是「引擎状态」，不是参数面板**。三件事一次看全：检索档位（现场做策略对比）、
-  Top-K、网关语义缓存命中率。顶部两个指示灯（`Engine` / `AST Guardrail`）由
+  Top-K、网关语义缓存命中率。顶部两个指示灯（`Engine` / `Read-only Guard`）由
   `st.empty()` 占位、结果出来后再回填——因为「引擎是否真的加载成功」要等检索器
   加载完才知道，而侧边栏必须先于主区渲染（它的控件决定本次请求参数）。
 - **中栏只回答「结论是什么」**：一句话核心结论 + 路由器/工具/行数/耗时四张卡 +
@@ -57,7 +57,7 @@
   而不是把「拒绝」混在一堆数字里。
 - **右栏是「凭什么」**：合规依据（Top-1 生效口径原文 + 溯源徽标）、版本口径比对
   （同一 `policy_key` 下按 `effective_from` 标出现行 / 已废止）、审计调用链时间线、
-  AST 校验结论、实际执行的只读 SQL 与绑定参数。面试现场可以直接指着这一栏讲
+  只读护栏结论、实际执行的只读 SQL 与绑定参数。面试现场可以直接指着这一栏讲
   「我们做的不是聊天框，是能对账的审计链」。
 - **场景胶囊点一下 = 填问句 + 立即执行**。合规口径类的问句直接取自
   `eval/datasets/stage1_eval.jsonl` 的真实评测题，不手写、不改写；评测集缺失时
@@ -189,6 +189,42 @@ BM25 与混合精排的 `Recall@5` 都是 `1.0000`（Dense 是 `0.9667`）。这
 
 ---
 
+## 1.3 「🛡️ 架构边界与设计权衡说明」折叠面板（三栏下方通栏）
+
+这一节只回答一个问题：**哪些是真算法，哪些是演示替身**。默认折叠不占主视觉，
+展开后分三块（截图：`docs/demo/11-架构边界与设计权衡.png`，宽 1124 px、高 2052 px）：
+
+| 区块 | 讲什么 |
+| :--- | :--- |
+| ① 底层真实组件 | 检索链路 / 细粒度溯源 / Agent 编排 / 固定口径工具 / 只读长尾查询 / 自我纠错 / 数据基底——每条都给「可核对位置」的源码路径 |
+| ② 演示替身与设计权衡 | 自然语言生成层用 `LocalDemoProvider` 的原因、为什么演示时刻意不接大模型、真实数据接入范围与它的边界 |
+| ③ 只读护栏的真实分层 | 五层独立机制（文件级只读 / authorizer 回调 / 表列函数白名单 / 语句形态检查 / 预算与结果集上限），每层给代码位置 |
+
+### 一处自我纠正：本项目没有做过「AST 校验」
+
+早期版本的界面与文档把第 ④ 层写成「AST 校验」，**属于用词夸大**：
+`ReadOnlyGuard.validate_sql()` 只是写操作关键字正则 + 拒绝多语句 + 首关键字白名单，
+真正的结构信息来自 **SQLite 自己的 `authorizer` 回调**（第 ②③ 层）。
+仓库里从未 import 过 `ast` 去解析 SQL。
+
+本轮把界面 6 处、本文档 6 处全部改回「只读护栏」，并在面板底部留了一行主动说明——
+**留着它比删掉更能证明这一页是核过的**。
+`tests/unit/test_benchmark_panel.py::test_不得再自称做过_AST_解析` 会拦住这个词回潮。
+
+### 两个工程细节
+
+- **数字仍然直读产物**：订单量／切片数／文档数／评测题数取自 `reports/stage1_manifest.json`，
+  客户号缺失率取自 `reports/real_data_stats.json`，`max_retries` 与护栏预算直接反射
+  `FinOpsAgent.__init__.__kwdefaults__` / `ReadOnlyGuard.__init__.__defaults__`——
+  谁改了默认值，这一页跟着变，不会留下过期承诺。
+  （需求稿里写的「客户号缺失 24.9%」与产物不符，实际是 **22.7669% / 243,007 行**，页面取后者。）
+- **长文本用卡片，不用 `st.dataframe`**：面板挂在右栏时宽仅 409 px，「可核对位置」整列右半
+  被截断；即便通栏 1124 px，`st.dataframe` 也会截断「检索链路」那行的模型名与 RRF k 值。
+  这两列是这一页的全部信息，所以第 ①② 节走会折行的卡片，第 ③ 节字段短、仍用表格。
+  `test_架构边界页的长文本不得退回_dataframe` 守住这个选择。
+
+---
+
 ## 2. 三条链路
 
 ### 2.1 RAG 链路（右栏「合规依据」+「其余命中」）
@@ -222,7 +258,7 @@ question
             ├─ route        意图分流：metric / sql / refuse
             ├─ MetricTool   固定 schema，防口径漂移（order_count / revenue /
             │               avg_order_value / cancel_rate × category/merchant/status/month）
-            ├─ SafeSQLTool  只读长尾查询 + AST 校验（拒绝写操作）
+            ├─ SafeSQLTool  只读长尾查询 + 只读护栏五层（拒绝写操作）
             ├─ Reflector    报错与异常值自我纠错，最多重试 2 次
             └─ answer       只用工具真实返回的数字组织回答
   └─ _decision_panel(agent_payload, rag_payload)   ← 中栏
@@ -234,7 +270,7 @@ question
        └─ st.dataframe(result.rows) ← 返回数据原文
   └─ _evidence_panel(...)                          ← 右栏
        ├─ _timeline_html(state.trace) ← 审计调用链时间线（每节点一行，绿/红标成败）
-       ├─ st.metric ×3          ← AST 校验 / 重试次数 / 执行耗时
+       ├─ st.metric ×3          ← 只读护栏 / 重试次数 / 执行耗时
        ├─ st.code(result.sql)   ← 实际执行的只读 SQL + 绑定参数
        └─ st.expander ×2        ← state.trace（原始 JSON）+ state.decision
 ```
@@ -259,7 +295,7 @@ question
 
 ---
 
-## 3. 九个刻意的设计决策
+## 3. 十个刻意的设计决策
 
 | # | 决策 | 原因 |
 |---|---|---|
@@ -272,6 +308,7 @@ question
 | 7 | 三个「预设问题」按钮**点了直接跑** | 原先只填输入框不触发运行，用户看到有字了以为在跑，实际什么都没发生 |
 | 8 | 经营指标 Tab 加「口径类问题」提示 | 该 Tab 是固定口径 Agent，规则类问题它给的是**数字**不是**规则原文**，容易被误读成答非所问 |
 | 9 | 侧边栏 `selectbox`/`slider` 显式给 `key` | 不给 key 时 Streamlit 用 label 生成 key，`_set_question` 回调读不到当前档位，会用错默认值重跑 |
+| 10 | 架构边界面板**通栏 + 长文本用卡片** | 挂在右栏时宽仅 409 px，`st.dataframe` 把「可核对位置」整列右半截掉；通栏 1124 px 也会截断「检索链路」的模型名与 RRF k 值。见 §3.10 |
 
 ### 3.9 为什么加了「回答依据」块（真实 bug 复盘）
 
@@ -290,6 +327,22 @@ question
 
 同一句问题："当前生效口径下，退款核算/家居生活中哪些订单状态可以计入营收？" —— **词法检索被 V1 的表面词面骗了，混合+精排抓到了 V2。** 这两张图是简历那条"混合检索修好 V1/V2 版本混排"的视觉证据。
 
+### 3.10 为什么把架构边界面板搬到通栏、又把长文本改成卡片
+
+这是同一类问题的两次修正，都源于**先相信渲染结果、不先量尺寸**：
+
+1. 面板最初放在右栏（`evidence_col`）。截图后发现 `st.dataframe` 的第三列
+   「可核对位置」右半被切掉。用 CDP 量真实 DOM：右栏 `.block-container` 里边只有 **409 px**。
+   → 搬到三栏下方的通栏（**1124 px**）。
+2. 通栏后仍有一行被截断：**「检索链路」**那条的正文是这一页最长的一句
+   （BM25 参数 + 向量模型 + RRF k 值 + 精排模型 + 候选窗口），`st.dataframe` 会横向滚动，
+   而截掉的恰好是模型名与 `k=60`——**面试官最想核的就是这两个值**。
+   → 第 ①② 节改为会折行的卡片（`_arch_card_html()`），第 ③ 节字段短、保留表格。
+   代价是少一点表格式的整齐，换来全部信息默认可见。
+
+两个防回归守卫在 `tests/unit/test_benchmark_panel.py`：
+`test_架构边界页的长文本不得退回_dataframe` 与 `test_架构边界页把五层只读护栏逐层列清`。
+
 ---
 
 ## 4. 哪些是 `src/` 的真逻辑、哪些是 demo 的壳
@@ -301,6 +354,7 @@ question
 | `HybridRetriever` / BM25 / Dense / RRF / Cross-Encoder | **真实** | `src/rag/`，一行未改 |
 | `FinOpsAgent` LangGraph 状态机 | **真实** | `src/agent/graph.py` |
 | `MetricTool` / `SafeSQLTool` / `Reflector` | **真实** | `src/agent/` |
+| 只读护栏（五层） | **真实**，但**不该叫「AST 校验」** | `src/agent/tools.py:245 ReadOnlyGuard`。第 ④ 层是写操作关键字正则 + 拒绝多语句 + 首关键字白名单；真正带结构信息的是 **SQLite 自己的 `authorizer` 回调**（第 ②③ 层）。仓库从未 `import ast` 解析过 SQL，早期界面与文档里的「AST 校验」属于用词夸大，已全部改回「只读护栏」并留了自纠说明（§1.3） |
 | `create_app` / 语义缓存 / 主备故障转移 / SSE 降级 | **真实** | `src/gateway/` |
 | 订单库 `orders.db`（50,000 单） | **真实** | `scripts/` 合成，含 6 类业务脏数据 |
 | 规则语料 `chunks.jsonl`（5,000 片 / 250 文档） | **真实** | Stage 1 合成 |
@@ -339,8 +393,8 @@ question
 ```bash
 cd FinOps-Copilot
 
-# ① 单元测试（~16s，不打 UI；含评测看板的口径守卫）
-.venv/Scripts/python.exe -m pytest tests/unit/ -q          # → 65 passed
+# ① 单元测试（~17s，不打 UI；含评测看板与架构边界页的口径守卫）
+.venv/Scripts/python.exe -m pytest tests/unit/ -q          # → 73 passed
 
 # ② 命令行语义自检（不启 UI，直接跑 RAG 溯源 + Agent 三路由）
 .venv/Scripts/python.exe app/smoke_check.py
@@ -355,7 +409,8 @@ cd FinOps-Copilot
 .venv/Scripts/python.exe app/capture_demo2.py              # 06–07 纯 BM25 vs 精排对照
 .venv/Scripts/python.exe app/capture_showcase.py           # 08–09 两个对抗演示
 .venv/Scripts/python.exe app/capture_benchmark.py          # 10 评测基准看板（整页长图）
-.venv/Scripts/python.exe app/build_contact_sheet.py        # 拼 00-Demo总览.png
+.venv/Scripts/python.exe app/capture_boundaries.py         # 11 架构边界面板（展开态）
+.venv/Scripts/python.exe app/build_contact_sheet.py        # 拼 00-Demo总览.png（11 格）
 ```
 
 启动界面：
@@ -379,7 +434,7 @@ Windows 上一键（含自动找浏览器）：
 
 | 路径 | 作用 |
 |---|---|
-| `app/streamlit_app.py` | 界面全部代码（约 2320 行，含对抗演示区与评测基准看板） |
+| `app/streamlit_app.py` | 界面全部代码（约 2774 行，含对抗演示区、评测基准看板与架构边界面板） |
 | `app/README.md` | 运行方式 + 与 `src/` 对不上的 5 处已知问题 |
 | `app/smoke_check.py` | 命令行自检：RAG 溯源 + Agent 三路由 |
 | `app/apptest_check.py` | AppTest 全流程检查（6 条链路，含两个对抗演示） |
@@ -388,9 +443,10 @@ Windows 上一键（含自动找浏览器）：
 | `app/capture_demo2.py` | 同上，采纯 BM25 vs 精排对照（06–07） |
 | `app/capture_showcase.py` | 同上，采两个对抗演示（08–09） |
 | `app/capture_benchmark.py` | 同上，采评测基准看板整页长图（10） |
-| `app/build_contact_sheet.py` | 把各图拼成 `00-Demo总览.png`（普通面板两列、长图独占整行） |
-| `tests/unit/test_benchmark_panel.py` | 守卫看板口径：现读产物再断言页面渲染出同样的值 |
-| `docs/demo/` | 10 张截图 + `00-Demo总览.png`（1 页看全） |
+| `app/capture_boundaries.py` | 同上，展开架构边界面板并采集（11） |
+| `app/build_contact_sheet.py` | 把各图拼成 `00-Demo总览.png`（普通面板两列、长图独占整行，共 11 格） |
+| `tests/unit/test_benchmark_panel.py` | 守卫看板与架构边界页的口径：现读产物再断言页面渲染出同样的值 |
+| `docs/demo/` | 11 张截图 + `00-Demo总览.png`（1 页看全） |
 | `docs/Demo设计说明.md` | 本文件 |
 | `docs/真实数据接入.md` | 真实公开数据接入说明 |
 | `reports/stage2_retrieval_findings.md` | EVAL-116 检索回退归因（含 tie-break 修复） |

@@ -2,13 +2,13 @@
 
 布局是「Copilot 三栏决策工作台」：
 
-1. **左栏 · 引擎配置与系统监控**（``st.sidebar``）：引擎/AST 护栏状态指示灯、
+1. **左栏 · 引擎配置与系统监控**（``st.sidebar``）：引擎/只读护栏状态指示灯、
    检索策略与返回条数、语义网关的运行时指标。
 2. **中栏 · 业务决策看板**：品牌 Header → 业务场景快选 → 问句与执行 →
    核心结论卡片 + 业务指标看板；命中写操作/PII 时切换为红色安全护栏横幅。
 3. **右栏 · 证据链与审计**：合规依据（Top-1 规则原文 + 溯源徽标）、
    版本口径比对（现行 / 已废止）、LangGraph 审计调用链（节点时间线 +
-   AST 校验结论 + 实际执行的只读 SQL + 结构化 trace）。
+   只读护栏结论 + 实际执行的只读 SQL + 结构化 trace）。
 
 工程约束（这几条是刻意为之，改动前请先读）：
 
@@ -104,7 +104,7 @@ SHOWCASE_SCENARIOS: dict[str, dict[str, Any]] = {
         "question": SHOWCASE_DELETE_QUESTION,
         "blurb": (
             "把一条真正的 DELETE 语句当成业务问题提交。意图路由器在工具之前就拦下它，"
-            "只读连接与 AST 校验根本不会看到写操作。"
+            "只读连接与只读护栏根本不会看到写操作。"
         ),
         "kind": "guardrail",
     },
@@ -530,7 +530,7 @@ def _health_dot(ok: bool | None) -> str:
 
 
 def _status_bar(engine_state: bool | None, engine_text: str, guard_text: str) -> str:
-    """侧边栏顶部的微型状态条：``● Engine: Online | AST Guardrail: Active``。"""
+    """侧边栏顶部的微型状态条：``● Engine: Online | Read-only Guard: Active``。"""
     return (
         '<div class="fops-statusbar">'
         f'<span class="fops-dot {_health_dot(engine_state)}"></span>'
@@ -538,7 +538,7 @@ def _status_bar(engine_state: bool | None, engine_text: str, guard_text: str) ->
         f'<span class="fops-status-v">{_esc(engine_text)}</span>'
         '<span class="fops-status-sep">|</span>'
         f'<span class="fops-dot {_health_dot(True)}"></span>'
-        '<span class="fops-status-k">AST Guardrail</span>'
+        '<span class="fops-status-k">Read-only Guard</span>'
         f'<span class="fops-status-v">{_esc(guard_text)}</span>'
         "</div>"
     )
@@ -1731,7 +1731,7 @@ def _evidence_panel(rag_payload: dict[str, Any] | None, agent_payload: dict[str,
     result = getattr(state, "result", None)
     checklist = st.columns(3)
     checklist[0].metric(
-        "AST 校验",
+        "只读护栏",
         "通过" if (result is not None and getattr(result, "ok", False)) else "跳过",
         help="请求在意图路由阶段就被护栏拦下时不会产生任何 SQL，因此没有可校验的语句。",
     )
@@ -1751,6 +1751,291 @@ def _evidence_panel(rag_payload: dict[str, Any] | None, agent_payload: dict[str,
         st.json(safe_json_dump(trace))
     with st.expander("请求决策与参数", expanded=False):
         st.json(safe_json_dump(getattr(state, "decision", None)))
+
+
+# ==========================================================================
+# 十一之三、架构边界与设计权衡（可折叠面板）
+# ==========================================================================
+# 这一节只回答一个问题：**哪些是真算法组件，哪些是演示替身**。
+# 三条自缚规则（写在代码里，不只写在文档里）：
+#   ① 每条「真实」都指向仓库里可打开的符号，不写没有出处的形容词；
+#   ② 每条「替身」都写清替掉了什么、为什么这样替、接回真实组件要改哪一处；
+#   ③ 实验数字直读产物、代码事实直读源码默认参数，文案里一律不手抄。
+# ③ 由 tests/unit/test_benchmark_panel.py 的棘轮测试强制。
+#
+# 为什么值得单独做一页：这个 Demo 的检索、状态机、只读护栏都是真的，只有「最后
+# 把结构化结果写成中文」这一步是确定性替身。如果不主动说清，面试官要么以为整页
+# 都是壳、要么以为我们在装黑盒大模型——两种误判都亏。边界写明白，真的部分才可信。
+# --------------------------------------------------------------------------
+RAG_CONFIG_YAML = ROOT / "config" / "rag.yaml"
+ARCH_SRC_RAG = "src/rag/{bm25,dense,fusion,rerank,hybrid}.py"
+ARCH_SRC_AGENT = "src/agent/graph.py · src/agent/tools.py"
+
+
+@lru_cache(maxsize=None)
+def _arch_retrieval_facts() -> dict[str, Any]:
+    """检索链路的**配置事实**：直读 ``config/rag.yaml``，超参不在文案里手抄。"""
+    facts: dict[str, Any] = {
+        "rrf_k": None,
+        "top_k": None,
+        "rerank_window": None,
+        "bm25_k1": None,
+        "bm25_b": None,
+        "tokenizer": None,
+        "dense_model": None,
+        "rerank_model": None,
+    }
+    try:
+        import yaml
+
+        raw = yaml.safe_load(RAG_CONFIG_YAML.read_text(encoding="utf-8")) or {}
+    except (OSError, ValueError, TypeError, ImportError):
+        return facts
+    retrieval = raw.get("retrieval") or {}
+    facts.update(
+        {
+            "rrf_k": (retrieval.get("fusion") or {}).get("rrf_k"),
+            "top_k": retrieval.get("top_k"),
+            "rerank_window": (retrieval.get("reranker") or {}).get("candidate_k"),
+            "bm25_k1": (retrieval.get("bm25") or {}).get("k1"),
+            "bm25_b": (retrieval.get("bm25") or {}).get("b"),
+            "tokenizer": (retrieval.get("bm25") or {}).get("cjk_tokenizer"),
+            "dense_model": (retrieval.get("dense") or {}).get("model_id"),
+            "rerank_model": (retrieval.get("reranker") or {}).get("model_id"),
+        }
+    )
+    return facts
+
+
+@lru_cache(maxsize=None)
+def _arch_data_facts() -> dict[str, Any]:
+    """数据基底的**规模事实**：直读 ``reports/stage1_manifest.json`` 的 summary/evaluation。"""
+    facts: dict[str, Any] = {
+        "orders": None,
+        "rule_chunks": None,
+        "rule_documents": None,
+        "dirty_orders": None,
+        "dirty_types": None,
+        "qa_pairs": None,
+    }
+    payload = _bench_json(str(STAGE1_MANIFEST_JSON))
+    if not payload:
+        return facts
+    summary = payload.get("summary") or {}
+    evaluation = payload.get("evaluation") or {}
+    anomaly = summary.get("anomaly_counts") or {}
+    facts.update(
+        {
+            "orders": summary.get("orders"),
+            "rule_chunks": summary.get("rule_chunks"),
+            "rule_documents": summary.get("rule_documents"),
+            "dirty_orders": summary.get("dirty_orders"),
+            "dirty_types": len(anomaly) or None,
+            "qa_pairs": evaluation.get("qa_pairs"),
+        }
+    )
+    return facts
+
+
+@lru_cache(maxsize=None)
+def _arch_real_facts() -> dict[str, Any]:
+    """真实数据旁证的**结构事实**：直读 ``reports/real_data_stats.json``。"""
+    facts: dict[str, Any] = {"rows": None, "missing_customer_pct": None, "missing_customer_rows": None}
+    payload = _bench_json(str(REAL_STATS_JSON))
+    if not payload:
+        return facts
+    inventory = payload.get("real_inventory") or {}
+    missing = inventory.get("missing_customer_id") or {}
+    facts.update(
+        {
+            "rows": inventory.get("rows_total"),
+            "missing_customer_pct": missing.get("pct"),
+            "missing_customer_rows": missing.get("rows"),
+        }
+    )
+    return facts
+
+
+@lru_cache(maxsize=None)
+def _arch_code_facts() -> dict[str, Any]:
+    """两个**代码事实**：重试上限与护栏预算直读类的默认参数。
+
+    这样即使有人改了 ``src/agent`` 里的默认值，这一页也会跟着变，不会留下过期承诺。
+    """
+    facts: dict[str, Any] = {"max_retries": None, "instruction_budget": None, "max_rows": None}
+    try:
+        from src.agent.graph import FinOpsAgent
+        from src.agent.tools import ReadOnlyGuard
+
+        kw = FinOpsAgent.__init__.__kwdefaults__ or {}
+        pos = ReadOnlyGuard.__init__.__defaults__ or ()
+        facts["max_retries"] = kw.get("max_retries")
+        if len(pos) > 0:
+            facts["instruction_budget"] = int(pos[0])
+        if len(pos) > 1:
+            facts["max_rows"] = int(pos[1])
+    except (ImportError, TypeError, ValueError):
+        return facts
+    return facts
+
+
+# 只读护栏的五层。写在这里而不是从代码里反射，是因为「哪一层拦下了哪条 payload」
+# 是本页要讲的结论；表里的行列名与 payload 结果由 tests/unit/test_benchmark_panel.py
+# 对着 src/agent/tools.py 与 tests 固化。
+READONLY_LAYERS: tuple[tuple[str, str, str], ...] = (
+    ("① 文件级只读", "连接串 mode=ro，SQLite 层面对写入直接报错", "tools.py:253 ReadOnlyGuard.connect"),
+    ("② authorizer 回调", "set_authorizer 按 action 逐条判定，非 READ 动作一律 SQLITE_DENY", "tools.py:272 ReadOnlyGuard._authorizer"),
+    ("③ 表 / 列 / 函数白名单", "READ 动作再校验表名列名；函数只放行已审计的聚合函数", "tools.py:31 ALLOWED_TABLES · ALLOWED_COLUMNS · ALLOWED_FUNCTIONS"),
+    ("④ 语句形态检查", "写操作关键字正则黑名单 + 拒绝多语句 + 必须以 SELECT/WITH 开头", "tools.py:83 _FORBIDDEN_SQL · tools.py:292 ReadOnlyGuard.validate_sql"),
+    ("⑤ 预算与结果集上限", "set_progress_handler 按 VM 步数中断；fetchmany 截断返回行数", "tools.py:262 progress · tools.py:302 ReadOnlyGuard.execute"),
+)
+
+
+def _arch_card_html(rows: list[tuple[str, str, str]], foot_label: str) -> str:
+    """把长文本对照项渲染成卡片，而不是 ``st.dataframe``。
+
+    为什么不表格：这一页通栏可用宽度约 1100px，三列中文排不下，「真实实现」与
+    「接回真实组件」会被横向截断——而这两列恰恰是这一页的全部信息（实测右栏 409px
+    时更严重，「可核对位置」整列右半被切掉）。卡片让文本自然折行，代价是少一点表格
+    式的整齐，这里值得换。字段较短的第 3 张表（五层护栏）仍用 ``st.dataframe``。
+    """
+    parts: list[str] = []
+    for title, body, foot in rows:
+        parts.append(
+            '<div class="fops-card" style="padding:12px 16px;margin:0 0 10px 0;">'
+            f'<div><span class="fops-badge">{_esc(title)}</span></div>'
+            f'<div style="margin:9px 0 7px;line-height:1.75;">{_esc(body)}</div>'
+            f'<div style="color:#94a3b8;font-size:0.82rem;line-height:1.5;">'
+            f"{_esc(foot_label)}：{_esc(foot)}</div></div>"
+        )
+    return "".join(parts)
+
+
+def _render_arch_boundaries() -> None:
+    """三栏下方的可折叠面板：分清真实组件与演示替身，并列出只读护栏的真实分层。
+
+    默认折叠，不占主视觉空间；放在证据链正下方，面试官看 Trace 时正好在同一视线内。
+    """
+    with st.expander("🛡️ 架构边界与设计权衡说明", expanded=False):
+        st.caption(
+            "这一节只回答一个问题：**哪些是真算法，哪些是演示替身**。"
+            "每条「真实」都能在仓库里打开对应文件核对；每条「替身」都写清了接回真实组件要改哪里。"
+        )
+
+        rag = _arch_retrieval_facts()
+        data = _arch_data_facts()
+        real = _arch_real_facts()
+        code = _arch_code_facts()
+
+        # ------------------------------------------------------------ 1 真实组件
+        st.markdown("##### 1 · 底层真实组件")
+        st.markdown(
+            _arch_card_html(
+                [
+                    (
+                        "检索链路",
+                        f"BM25（k1={rag['bm25_k1']}／b={rag['bm25_b']}／{rag['tokenizer']}）"
+                        f" + 向量召回（{rag['dense_model']}）"
+                        f" → RRF 倒数融合（k={rag['rrf_k']}）"
+                        f" → Cross-Encoder 精排（{rag['rerank_model']}）"
+                        f"，候选窗口 {rag['rerank_window']}，取 Top-{rag['top_k']}",
+                        f"config/rag.yaml · {ARCH_SRC_RAG}",
+                    ),
+                    (
+                        "细粒度溯源",
+                        "每条命中自带 [Doc_ID, Page, Line] 与 policy_key／effective_from／version，可回指切片原文",
+                        "src/rag/models.py · data/generated/rule_docs/chunks.jsonl",
+                    ),
+                    (
+                        "Agent 编排",
+                        "LangGraph StateGraph 六节点：route → metric｜sql｜refuse → reflect → answer",
+                        "graph.py:319 FinOpsAgent._build_graph",
+                    ),
+                    (
+                        "固定口径工具",
+                        "MetricTool 只接受枚举化 Schema（指标／维度／时间窗），从根上防口径漂移，不接受自由 SQL",
+                        "tools.py:313 MetricTool · :89 Metric · :96 Dimension",
+                    ),
+                    (
+                        "只读长尾查询",
+                        "SafeSQLTool + ReadOnlyGuard（五层，见下节第 3 张表）",
+                        "tools.py:339 SafeSQLTool · :245 ReadOnlyGuard",
+                    ),
+                    (
+                        "自我纠错",
+                        f"reflect 节点是唯一允许改写查询的节点，重试上限 max_retries={code['max_retries']}",
+                        "graph.py:230 _reflect_node · :132 FinOpsAgent",
+                    ),
+                    (
+                        "数据基底",
+                        f"合成订单 {data['orders']:,} 单（注入 {data['dirty_types']} 类脏数据共 {data['dirty_orders']:,} 单）"
+                        f" + 规则切片 {data['rule_chunks']:,} 片／{data['rule_documents']:,} 份文档"
+                        f" + 离线评测题 {data['qa_pairs']} 题",
+                        "reports/stage1_manifest.json · scripts/generate_dataset.py",
+                    ),
+                ],
+                "可核对位置",
+            ),
+            unsafe_allow_html=True,
+        )
+
+        # ------------------------------------------------------------ 2 演示替身
+        st.markdown("##### 2 · 演示替身与设计权衡")
+        st.markdown(
+            _arch_card_html(
+                [
+                    (
+                        "自然语言生成层",
+                        "LocalDemoProvider：离线确定性 provider，按 system prompt 的用途分流，"
+                        "answer 分支只用工具真实返回的数字组织中文",
+                        "网关已实现 LLMClient + 主备 Provider 故障转移 + SSE 降级；"
+                        "把 provider 换成 LLMClient 即可，工具层与检索层不用改",
+                    ),
+                    (
+                        "为什么演示时不接大模型",
+                        "合规口径存在 V1／V2 两个版本，差异只在“completed 还是 shipped 计入营收”这一档。"
+                        "大模型自由改写会把两个版本的说法抹平——恰恰抹掉了本项目最想证明的能力：版本感知检索",
+                        "演示阶段直接展示规则原文保真；接 LLM 时把口径原文作为强约束上下文注入，"
+                        "并由评测集回归守住版本区分度",
+                    ),
+                    (
+                        "真实数据接入范围",
+                        f"UCI Online Retail II 共 {real['rows']:,} 行，仅用于压力测试结构性缺失"
+                        f"（如客户号缺失 {real['missing_customer_pct']}%／{real['missing_customer_rows']:,} 行）",
+                        "旁证，不混入合成训练：真实源没有 lifecycle／channel 列，status 是派生近似，"
+                        "已在 real_data_stats.json 的 note_* 字段逐条标明",
+                    ),
+                ],
+                "接回真实组件",
+            ),
+            unsafe_allow_html=True,
+        )
+
+        # ------------------------------------------------------ 3 只读护栏分层
+        st.markdown("##### 3 · 只读护栏的真实分层（五层独立生效）")
+        st.dataframe(
+            [
+                {"层": layer, "机制": how, "代码位置": where}
+                for layer, how, where in READONLY_LAYERS
+            ],
+            hide_index=True,
+            width="stretch",
+        )
+        st.caption(
+            f"第 ⑤ 层的预算是每条查询约 {code['instruction_budget']:,} 条 SQLite 虚拟机指令"
+            f"（每 10000 个 VM 步回调一次），结果集上限 {code['max_rows']} 行；"
+            "①②③ 由 SQLite 自己在解析／执行阶段强制执行，④ 是我们进入数据库之前的字符串检查。"
+        )
+
+        # 这一条是自我纠正：早期版本把第 ④ 层叫成「AST 校验」，但它其实是正则 +
+        # 字符串检查，本项目从头到尾没有做过任何语法树解析。留着这句话，比悄悄删掉
+        # 更能证明这套边界说明是核过的。
+        st.info(
+            "**关于命名的自我纠正**：本项目**没有**做语法树（AST）解析。"
+            "第 ④ 层是写操作关键字正则 + 多语句拒绝 + 首关键字白名单；"
+            "真正带结构信息的是 SQLite 自己的 authorizer 回调（第 ②③ 层）。"
+            "早期版本的界面与文档把这一层写成“AST 校验”，属于用词夸大，现已全部改回“只读护栏”。"
+        )
 
 
 # ==========================================================================
@@ -2457,6 +2742,11 @@ def main() -> None:
             _decision_panel(agent_payload, rag_payload)
         with evidence_col:
             _evidence_panel(rag_payload, agent_payload)
+
+        # 边界说明放通栏、就在三栏之下，而不是塞进右栏：它是三张对照表，右栏只有
+        # 400px 左右，实测会把「可核对位置」整列挤掉——那恰好是这一页最该被核对的东西。
+        # 默认折叠，所以并不占主视觉空间。
+        _render_arch_boundaries()
 
         st.divider()
         st.caption(DISCLAIMER)

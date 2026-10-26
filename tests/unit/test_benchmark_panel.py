@@ -190,6 +190,8 @@ BENCH_RENDER_FUNCS = {
     "_score_spread",
     "_rule_documents",
     "_gold_rank",
+    # 架构边界面板与看板同属「对外自证」的展示层，同样不许手抄数字。
+    "_render_arch_boundaries",
 }
 
 DATA_NUMBER = (
@@ -270,3 +272,103 @@ def test_词面相似度与重排分值不得混为一谈(app: AppTest, markdown
     assert f"{min(rerank):.4f}–{max(rerank):.4f}" in markdown_text, (
         "重排分值区间没有按产物渲染（cross_encoder_scores[].rerank_score）"
     )
+
+
+# ---------------------------------------------------------------------------
+# 架构边界页：这一页的卖点就是「主动交代边界」，所以它自己最不能说过头的话
+# ---------------------------------------------------------------------------
+
+MANIFEST = ROOT / "reports" / "stage1_manifest.json"
+
+
+def _frame_text(frame) -> str:
+    return "\n".join(str(value) for value in frame.to_numpy().ravel())
+
+
+def test_架构边界页把五层只读护栏逐层列清(app: AppTest) -> None:
+    """护栏不是一句「我们做了只读」，是五层独立机制；页面必须逐层给机制和代码位置。"""
+    from app.streamlit_app import READONLY_LAYERS
+
+    assert len(READONLY_LAYERS) == 5, "护栏层数变了：先确认 src/agent/tools.py 再改这里"
+    frame = _frame_with(app, "层")
+    assert list(frame["层"]) == [layer for layer, _, _ in READONLY_LAYERS]
+    text = _frame_text(frame)
+    for layer, how, where in READONLY_LAYERS:
+        assert how[:10] in text, f"{layer} 只给了名词，没给机制"
+        assert where in text, f"{layer} 没标出代码位置，面试官没法当场核对"
+
+
+def test_护栏表引用的符号必须真的存在于_tools_py(app: AppTest) -> None:
+    """表里写的是「可核对位置」，那就必须真能核对到——符号名要在源码里找得到。"""
+    tree = ast.parse((ROOT / "src" / "agent" / "tools.py").read_text(encoding="utf-8"))
+    defined = {
+        node.name
+        for node in ast.walk(tree)
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+    }
+    defined |= {
+        target.id
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Assign)
+        for target in node.targets
+        if isinstance(target, ast.Name)
+    }
+    frame = _frame_with(app, "层")
+    for where in frame["代码位置"]:
+        for symbol in re.findall(r"[A-Za-z_][A-Za-z0-9_]{2,}", str(where)):
+            if symbol in {"tools", "py"}:
+                continue
+            assert symbol in defined, f"面板引用的符号在 tools.py 里不存在：{symbol}"
+
+
+def test_架构边界页的数字与产物一致(markdown_text: str) -> None:
+    """真实组件那一节报的规模，必须与 reports/stage1_manifest.json 一致。"""
+    manifest = _load(MANIFEST)
+    summary = manifest["summary"]
+    stats = _load(REAL_STATS)["real_inventory"]
+
+    assert f"{summary['orders']:,}" in markdown_text, "合成订单量没有按 manifest 渲染"
+    assert f"{summary['rule_chunks']:,}" in markdown_text, "规则切片数没有按 manifest 渲染"
+    assert f"{summary['rule_documents']:,}" in markdown_text, "规则文档数没有按 manifest 渲染"
+    assert str(manifest["evaluation"]["qa_pairs"]) in markdown_text, "评测题数没有按 manifest 渲染"
+    assert str(stats["missing_customer_id"]["pct"]) in markdown_text, (
+        "真实数据缺失率没有按 real_data_stats.json 渲染"
+    )
+
+
+def test_架构边界页的长文本不得退回_dataframe(app: AppTest) -> None:
+    """三列中文在 1100px 通栏里排不下，``st.dataframe`` 会横向截断「真实实现」。
+
+    实测：右栏（409px）时「可核对位置」整列右半被切掉；通栏也会截断检索链路那行的
+    模型名与 RRF k 值。这两列正是这一页的全部信息，所以必须走会折行的卡片。
+    """
+    leaked = [
+        list(getattr(frame.value, "columns", []))
+        for frame in app.dataframe
+        if {"环节", "边界"} & set(getattr(frame.value, "columns", []))
+    ]
+    assert not leaked, f"架构边界的长文本表又变回了 st.dataframe，会被横向截断：{leaked}"
+
+
+def test_不得再自称做过_AST_解析() -> None:
+    """本项目从未做过语法树解析：第 ④ 层是正则 + 字符串检查。
+
+    唯一的例外是那条自我纠正说明——留着它比删掉更能证明这页是核过的。
+    """
+    offenders = [
+        f"L{i}: {line.strip()}"
+        for i, line in enumerate(
+            (ROOT / "app" / "streamlit_app.py").read_text(encoding="utf-8").splitlines(), 1
+        )
+        if "AST" in line and "自我纠正" not in line and "用词夸大" not in line
+    ]
+    assert not offenders, (
+        "页面又出现了 AST 宣称（真正的结构校验在 SQLite authorizer，不在我们代码里）：\n"
+        + "\n".join(offenders)
+    )
+
+
+def test_边界页必须自己承认哪一层是替身(markdown_text: str) -> None:
+    """只讲「我们都做了什么」，不讲「哪一层是替身」，这一页就没有意义。"""
+    assert "LocalDemoProvider" in markdown_text, "没点名自然语言生成层是本地确定性替身"
+    assert "接回真实组件" in markdown_text, "替身表没有「怎么接回真实组件」这层说明"
