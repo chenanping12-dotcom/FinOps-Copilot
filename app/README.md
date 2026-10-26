@@ -1,5 +1,9 @@
 # FinOps-Copilot 交互式 Web Demo（Streamlit）
 
+> **设计说明见 [`../docs/Demo设计说明.md`](../docs/Demo设计说明.md)** —— 界面结构、三条链路
+> 的数据流、九个设计决策、`src/` 真逻辑与 demo 壳的边界表、已知限制、复现验证方式。
+> 本文件只讲「怎么跑」和「哪里跟 src/ 对不上」。
+
 ```bash
 cd FinOps-Copilot
 .venv/Scripts/python.exe -m streamlit run app/streamlit_app.py

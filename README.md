@@ -37,6 +37,10 @@
 截图与采集脚本见 `app/capture_demo.py`、`app/capture_demo2.py`、`app/build_contact_sheet.py`
 （通过 Chrome DevTools Protocol 驱动真实浏览器点击，不是手工摆拍）。
 
+**这个 Demo 的完整设计说明见 [`docs/Demo设计说明.md`](docs/Demo设计说明.md)** ——
+包含界面结构、三条链路的数据流、九个刻意的设计决策（含"为什么不接大模型"）、
+「哪些是 `src/` 真逻辑、哪些是 demo 壳」的边界表、已知限制与三层复现验证方式。
+
 ## 快速开始
 
 环境要求 Python 3.11+（本机实测运行环境为 3.13.3）。
