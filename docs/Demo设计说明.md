@@ -25,33 +25,54 @@
 ## 1. 界面结构
 
 ```
-┌─ 侧边栏 ─────────────┬─ 主区 ───────────────────────────────────┐
-│ 检索模式              │ 标题 + 一句话定位                          │
-│  ○ 混合检索+精排(默认)│ 检索配置 caption（模型/超参直接来自 rag.yaml）│
-│  ○ 混合检索(BM25+向量)│                                          │
-│  ○ BM25（词法基线）   │ ┌ 提问 ────────────────────────────────┐ │
-│  ○ 向量（BGE 语义）   │ │ 输入框（key="question"）              │ │
-│                       │ │ 知识库预设题 ×3（来自真实评测集）      │ │
-│ 返回条数 top_k [1-10] │ │ 经营指标预设题 ×4                     │ │
-│                       │ └──────────────────────────────────────┘ │
-│ 语义缓存              │ [开始分析（同时跑 RAG 与 Agent）]          │
-│  /cache/stats 面板    │                                          │
-│ [启动本地演示网关]    │ ┌ 📚 知识库问答(RAG) ┬ 📊 经营指标(Agent)┐│
-│ [发2次/chat预热缓存]  │ │                                    ││
-│ 网关地址 [127.0.0.1:8000] │ 各自的「仅运行…」按钮 + 结果区  ││
-└───────────────────────┴──────────────────────────────────────────┘
+┌─ 侧边栏（引擎配置与监控）─┬─ 主区 ────────────────────────────────────────────────┐
+│ ● Engine  Online          │ [FC] FinOps Copilot                                   │
+│ ● AST Guardrail  Active   │      企业经营分析与合规审计控制台                      │
+│ (st.empty 占位，跑完回填) │                                                       │
+│                           │ 业务场景胶囊：退款确认口径 / 数码退货窗口 /            │
+│ 检索策略                  │              品类净营收 / 支付渠道分布 / 护栏拦截测试  │
+│  ◉ 混合检索+精排（默认）  │ ┌ 业务问题输入框 ──────────────────┐ ┌ 开始分析 ┐     │
+│  ○ 混合检索(BM25+向量)    │                                                       │
+│  ○ BM25（词法基线）       │ ┌─ 业务决策（约 60%）──┬─ 证据链与审计（约 40%）─────┐│
+│  ○ 向量（语义基线）       │ │ 核心结论卡片          │ 合规依据：溯源徽标 + 原文    ││
+│                           │ │ 路由/工具/行数/耗时   │ 版本口径比对（现行/已废止）  ││
+│ 返回条数 Top-K [1-10]     │ │ 业务指标看板          │ 其余命中表 + 逐条溯源明细    ││
+│                           │ │ 完整结论 / 返回数据表 │ 审计调用链时间线            ││
+│ 语义网关                  │ │                      │ AST 校验 / 重试 / 只读 SQL   ││
+│  网关地址 [127.0.0.1:8000]│ └──────────────────────┴──────────────────────────────┘│
+│  [启动本地网关][刷新统计] │                                                       │
+│  [预热语义缓存]           │ 演示数据与规则文档为本地合成样本，非真实平台政策。      │
+│  请求量 / 命中 / 命中率   │                                                       │
+└───────────────────────────┴───────────────────────────────────────────────────────┘
 ```
 
-两处细节：
+四层设计意图：
+
+- **左栏是「引擎状态」，不是参数面板**。三件事一次看全：检索档位（现场做策略对比）、
+  Top-K、网关语义缓存命中率。顶部两个指示灯（`Engine` / `AST Guardrail`）由
+  `st.empty()` 占位、结果出来后再回填——因为「引擎是否真的加载成功」要等检索器
+  加载完才知道，而侧边栏必须先于主区渲染（它的控件决定本次请求参数）。
+- **中栏只回答「结论是什么」**：一句话核心结论 + 路由器/工具/行数/耗时四张卡 +
+  从真实返回行派生的业务指标。命中的是写操作或 PII 时，整块换成红色安全护栏横幅，
+  而不是把「拒绝」混在一堆数字里。
+- **右栏是「凭什么」**：合规依据（Top-1 生效口径原文 + 溯源徽标）、版本口径比对
+  （同一 `policy_key` 下按 `effective_from` 标出现行 / 已废止）、审计调用链时间线、
+  AST 校验结论、实际执行的只读 SQL 与绑定参数。面试现场可以直接指着这一栏讲
+  「我们做的不是聊天框，是能对账的审计链」。
+- **场景胶囊点一下 = 填问句 + 立即执行**。合规口径类的问句直接取自
+  `eval/datasets/stage1_eval.jsonl` 的真实评测题，不手写、不改写；评测集缺失时
+  退回内置问句，保证演示仍然可点。
+
+两个实现细节：
 
 - **`st.dataframe(width="stretch")` + `hide_index=True`**：命中表把 `排名/溯源引用/方法/分数/Doc_ID/版本` 六列一次列全，不需要展开就能看到"这条来自哪份文档、第几页、哪一版"。
-- **`_as_json_object()` 包装**：Streamlit 1.66 的 `st.json()` 底层是 `reactJsonViewCompat`，**只接受 JSON 对象**；传 `None` 会被渲染成 `{"ERROR": "Object ... is not valid JSON"}`。Agent 的 `decision` / `trace` 在 refuse 路由下可能是 `None`，所以统一走这个包装函数。
+- **`safe_json_dump()` 包装**（旧名 `_as_json_object`，为兼容既有测试保留别名）：Streamlit 1.66 的 `st.json()` 底层是 `reactJsonViewCompat`，**只接受 JSON 对象**；传 `None` 会被渲染成 `{"ERROR": "Object ... is not valid JSON"}`。Agent 的 `decision` / `trace` / `components` 在 refuse 路由下可能是 `None` 或数组，所以统一走这个包装函数。
 
 ---
 
 ## 2. 三条链路
 
-### 2.1 RAG 链路（左 Tab）
+### 2.1 RAG 链路（右栏「合规依据」+「其余命中」）
 
 ```
 query
@@ -61,17 +82,19 @@ query
             ├─ DenseRetriever.search()    BGE 向量召回（bge-small-zh-v1.5）
             ├─ RRF 融合                    k=60，候选 candidate_k=100
             └─ CrossEncoderReranker        bge-reranker-base，取前 20 精排
-  └─ _render_rag_result(hits, elapsed, mode, query)
-       ├─ st.success  ← 「回答依据」：top-1 的 citation_label + 原文
-       ├─ st.dataframe ← 其余命中（排名/引用/方法/分数/Doc_ID/版本）
-       └─ st.expander ×N  ← 每条的四项元数据 + 命中片段正文 + 同页父块原文
+  └─ _evidence_panel(rag_payload, agent_payload)
+       ├─ .fops-evidence  ← 「合规依据」：top-1 的溯源徽标 + 版本 + 相关性 + 原文
+       ├─ st.dataframe   ← 「版本口径比对」：同 policy_key 按 effective_from 标现行/已废止
+       └─ 「其余命中」expander
+            ├─ st.dataframe        ← 排名/溯源引用/方法/分数/版本
+            └─ 每条一个嵌套 expander ← chunk_id/policy_key/scope/rule_type + 片段正文 + 父块原文
 ```
 
 **Parent-Child 分块在 UI 上被显式暴露**：每个 expander 里既有命中的**子块**正文，也有它所属的**同页父块**原文 —— 这是为了让"检索命中子块、但阅读需要父块"这个设计可被肉眼验证。
 
 `top_k` 滑杆是**实时传进检索器**的，不是前端截断 —— 改滑杆重跑，Cross-Encoder 的候选窗口会真的跟着变。
 
-### 2.2 Agent 链路（右 Tab）
+### 2.2 Agent 链路（中栏「业务决策」+ 右栏「审计调用链」）
 
 ```
 question
@@ -83,17 +106,23 @@ question
             ├─ SafeSQLTool  只读长尾查询 + AST 校验（拒绝写操作）
             ├─ Reflector    报错与异常值自我纠错，最多重试 2 次
             └─ answer       只用工具真实返回的数字组织回答
-  └─ _render_agent_result(state, elapsed)
-       ├─ st.success            ← 最终答案
-       ├─ st.metric ×5          ← 路由 / 工具 / 返回行数 / 重试次数 / 耗时
-       ├─ [条件] st.info        ← 「口径类问题」提示（见 §3.8）
-       ├─ st.json(state.decision)    ← 工具调用参数（可核对选了哪个 metric / dimension）
-       ├─ 实际执行的 SQL（只读）
-       ├─ st.dataframe(result.rows)  ← 返回数据原文
-       └─ st.expander ×2        ← state.trace（每节点轨迹）+ 完整 AgentState.as_dict()
+  └─ _decision_panel(agent_payload, rag_payload)   ← 中栏
+       ├─ [条件] .fops-guard    ← 写操作/PII 被拦截时整块换成红色安全护栏横幅
+       ├─ .fops-card「核心结论」 ← 答案首句
+       ├─ st.metric ×4          ← 路由 / 工具 / 返回行数 / 耗时
+       ├─ 业务指标看板           ← 从真实返回行派生的「返回分组 / 净营收合计 / 订单量合计」
+       ├─ st.expander「完整结论」 ← 答案全文
+       └─ st.dataframe(result.rows) ← 返回数据原文
+  └─ _evidence_panel(...)                          ← 右栏
+       ├─ _timeline_html(state.trace) ← 审计调用链时间线（每节点一行，绿/红标成败）
+       ├─ st.metric ×3          ← AST 校验 / 重试次数 / 执行耗时
+       ├─ st.code(result.sql)   ← 实际执行的只读 SQL + 绑定参数
+       └─ st.expander ×2        ← state.trace（原始 JSON）+ state.decision
 ```
 
-`state.trace` 展开后能看到 `route → plan → execute → answer` 每个节点的输入输出，**面试时可以直接用它证明"路由不是写死的 if-else"**。
+`state.trace` 会被渲染成**审计调用链时间线**（`route → metric → answer` 各一行），
+同时保留一份原始 JSON 备查，**面试时可以直接用它证明"路由不是写死的 if-else"**。
+只读 SQL 与绑定参数并排展示，是"护栏不是嘴说的"最直接的证据。
 
 ### 2.3 网关链路（侧边栏）
 

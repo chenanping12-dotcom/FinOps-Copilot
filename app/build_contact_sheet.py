@@ -9,16 +9,17 @@ HERE = Path(os.environ.get("DEMO_OUT", Path(__file__).resolve().parents[1] / "do
 OUT = HERE / "00-Demo总览.png"
 
 PANELS = [
-    ("01-首页.png", "① 首页：检索配置 / 预设题 / 三块能力入口"),
-    ("02-RAG检索结果.png", "② 知识库问答：混合检索 + Cross-Encoder 精排，带 [Doc_ID, Page, Line] 溯源"),
-    ("04-Agent指标路由.png", "④ 经营指标：LangGraph 走 metric 路由，返回口径说明与真实行数"),
-    ("05-写操作被拒绝.png", "⑤ 安全兜底：问「删掉所有订单」→ refuse 路由，不产出任何写 SQL"),
-    ("06-纯BM25排序.png", "⑥ 对照：纯 BM25 把旧版 POL-013-V1 排在第一位"),
-    ("07-混合检索精排排序.png", "⑦ 对照：混合+精排把当前生效的 POL-013-V2 提到第一位"),
+    ("01-首页.png", "① 首页：三栏工作台（左=引擎配置与监控 / 中=业务决策 / 右=证据链与审计）"),
+    ("02-RAG检索结果.png", "② 合规依据：命中生效口径原文，带 [DOC_ID] · Page · Line 溯源徽标与相关性"),
+    ("03-溯源明细展开.png", "③ 证据链：切片的 policy_key / scope / effective_from 与同页父块原文"),
+    ("04-Agent业务决策.png", "④ 业务决策：LangGraph 路由指标卡 + 业务指标看板 + 实际执行的只读 SQL"),
+    ("05-安全护栏拦截.png", "⑤ 安全护栏：问「删掉所有订单」→ refuse 路由，不产出任何写 SQL"),
+    ("06-纯BM25排序.png", "⑥ 策略对照：纯 BM25 把已废止的 POL-013-V1 排在第一位"),
+    ("07-混合检索精排排序.png", "⑦ 策略对照：混合检索+精排把现行生效的 POL-013-V2 提到第一位"),
 ]
 
 COLS = 2
-THUMB_W = 700
+THUMB_W = 660
 CAP_H = 46
 PAD = 16
 BG = (248, 249, 251)
