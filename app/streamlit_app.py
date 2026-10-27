@@ -1879,16 +1879,42 @@ def _arch_code_facts() -> dict[str, Any]:
     return facts
 
 
-# 只读护栏的五层。写在这里而不是从代码里反射，是因为「哪一层拦下了哪条 payload」
-# 是本页要讲的结论；表里的行列名与 payload 结果由 tests/unit/test_benchmark_panel.py
-# 对着 src/agent/tools.py 与 tests 固化。
+# 只读护栏的分层口径**以源码为准**：src/agent/tools.py:9-16 的模块 docstring 写的是
+# "read-only at four independent layers"，ReadOnlyGuard 的类 docstring 也是
+# "Four independent read-only layers"。写在这里而不是从代码里反射，是因为
+# 「哪一层拦下了哪条 payload」是本页要讲的结论；表里的行列名与 payload 结果由
+# tests/unit/test_benchmark_panel.py 对着 src/agent/tools.py 与 tests 固化。
+#
+# 下面四层都在 SQLite 内部强制执行；validate_sql 单列一行、**不计入**这四层（见 APPLICATION_PRE_CHECK）。
+# 单元格文字刻意压短：st.dataframe 不折行，超宽会被横向裁掉（旧版「机制」列就是这样
+# 少了半句）。被裁掉的具体常量名与数值统一放到表下的 caption 里说清楚——表格负责结构
+# 一眼可读，caption 负责逐条可核对，两边合起来才是完整证据。
 READONLY_LAYERS: tuple[tuple[str, str, str], ...] = (
-    ("① 文件级只读", "连接串 mode=ro，SQLite 层面对写入直接报错", "tools.py:253 ReadOnlyGuard.connect"),
-    ("② authorizer 回调", "set_authorizer 按 action 逐条判定，非 READ 动作一律 SQLITE_DENY", "tools.py:272 ReadOnlyGuard._authorizer"),
-    ("③ 表 / 列 / 函数白名单", "READ 动作再校验表名列名；函数只放行已审计的聚合函数", "tools.py:31 ALLOWED_TABLES · ALLOWED_COLUMNS · ALLOWED_FUNCTIONS"),
-    ("④ 语句形态检查", "写操作关键字正则黑名单 + 拒绝多语句 + 必须以 SELECT/WITH 开头", "tools.py:83 _FORBIDDEN_SQL · tools.py:292 ReadOnlyGuard.validate_sql"),
-    ("⑤ 预算与结果集上限", "set_progress_handler 按 VM 步数中断；fetchmany 截断返回行数", "tools.py:262 progress · tools.py:302 ReadOnlyGuard.execute"),
+    ("① 文件级只读", "连接串带 mode=ro；写入在 SQLite 打开／执行阶段即失败", "tools.py:253 ReadOnlyGuard.connect"),
+    ("② 语句级只读", "set_authorizer 按动作码逐条放行，其余一律 SQLITE_DENY", "tools.py:272 ReadOnlyGuard._authorizer"),
+    ("③ 名称白名单", "表名、列名、函数名三张白名单，清单外的名字拒绝执行", "tools.py:31 ALLOWED_TABLES 等三张白名单"),
+    ("④ 预算与结果集上限", "set_progress_handler 超预算即中断 + fetchmany 截断行数", "tools.py:265 progress ／ :302 execute"),
 )
+
+# **不计入上面四层**的一行：应用层前置校验。它在应用层、只看 SQL 文本，
+# INSERT/**/INTO、大小写、注释、嵌进 CTE 等写法都能绕过它，所以它只是**廉价的
+# 第一道过滤**，不构成安全保证；真正的保证是上面四层（都在 SQLite 内部）。
+APPLICATION_PRE_CHECK: tuple[str, str, str] = (
+    "应用层前置校验（不计入）",
+    "写操作关键字正则；只看 SQL 文本，可被注释／大小写绕过",
+    "tools.py:292 ReadOnlyGuard.validate_sql",
+)
+
+
+def readonly_layer_rows() -> list[dict[str, str]]:
+    """护栏表的行：4 行库内强制层（库内强制=是）+ 1 行应用层前置校验（=否，不计入）。"""
+    rows = [
+        {"层": layer, "机制": how, "代码位置": where, "库内强制": "是"}
+        for layer, how, where in READONLY_LAYERS
+    ]
+    layer, how, where = APPLICATION_PRE_CHECK
+    rows.append({"层": layer, "机制": how, "代码位置": where, "库内强制": "否（不计入上述四层）"})
+    return rows
 
 
 def _arch_card_html(rows: list[tuple[str, str, str]], foot_label: str) -> str:
@@ -1897,7 +1923,9 @@ def _arch_card_html(rows: list[tuple[str, str, str]], foot_label: str) -> str:
     为什么不表格：这一页通栏可用宽度约 1100px，三列中文排不下，「真实实现」与
     「接回真实组件」会被横向截断——而这两列恰恰是这一页的全部信息（实测右栏 409px
     时更严重，「可核对位置」整列右半被切掉）。卡片让文本自然折行，代价是少一点表格
-    式的整齐，这里值得换。字段较短的第 3 张表（五层护栏）仍用 ``st.dataframe``。
+    式的整齐，这里值得换。字段较短的第 3 张表（护栏分层）仍用 ``st.dataframe``，
+    但那些单元格必须短到不触发横向裁剪（该表「机制」列实测约 40 个字符宽），完整
+    常量名与数值放到表下 caption 里讲——表格管结构、caption 管细节。
     """
     parts: list[str] = []
     for title, body, foot in rows:
@@ -1958,7 +1986,7 @@ def _render_arch_boundaries() -> None:
                     ),
                     (
                         "只读长尾查询",
-                        "SafeSQLTool + ReadOnlyGuard（五层，见下节第 3 张表）",
+                        "SafeSQLTool + ReadOnlyGuard（四层库内强制 + 一层应用层前置校验，见下节第 3 张表）",
                         "tools.py:339 SafeSQLTool · :245 ReadOnlyGuard",
                     ),
                     (
@@ -2012,27 +2040,29 @@ def _render_arch_boundaries() -> None:
         )
 
         # ------------------------------------------------------ 3 只读护栏分层
-        st.markdown("##### 3 · 只读护栏的真实分层（五层独立生效）")
-        st.dataframe(
-            [
-                {"层": layer, "机制": how, "代码位置": where}
-                for layer, how, where in READONLY_LAYERS
-            ],
-            hide_index=True,
-            width="stretch",
-        )
+        st.markdown("##### 3 · 只读护栏的真实分层（四层库内强制 + 一层应用层前置校验）")
+        st.dataframe(readonly_layer_rows(), hide_index=True, width="stretch")
         st.caption(
-            f"第 ⑤ 层的预算是每条查询约 {code['instruction_budget']:,} 条 SQLite 虚拟机指令"
-            f"（每 10000 个 VM 步回调一次），结果集上限 {code['max_rows']} 行；"
-            "①②③ 由 SQLite 自己在解析／执行阶段强制执行，④ 是我们进入数据库之前的字符串检查。"
+            f"「库内强制=是」的 {len(READONLY_LAYERS)} 行就是源码 docstring 里的 "
+            f"four independent layers，全部在 SQLite 内部执行："
+            f"① 连接以 URI `mode=ro` 打开（`ReadOnlyGuard.connect`）；"
+            f"② `set_authorizer` 按动作码逐条判定，只放行 SELECT／READ／FUNCTION 三类动作"
+            f"（`_SQLITE_READ_ACTIONS`），其余一律 `SQLITE_DENY`；"
+            f"③ 表名、列名、函数名三张白名单 `ALLOWED_TABLES`／`ALLOWED_COLUMNS`／"
+            f"`ALLOWED_FUNCTIONS`；"
+            f"④ 每条查询约 {code['instruction_budget']:,} 条 SQLite 虚拟机指令的预算"
+            f"（每 10000 个 VM 步回调一次），结果集上限 {code['max_rows']} 行。"
+            "「库内强制=否」那一行是应用层的 `validate_sql`：写操作关键字正则 + 拒绝多语句 + "
+            "首关键字白名单，只看 SQL 文本，INSERT/**/INTO、大小写、注释、嵌入 CTE 都能绕过，"
+            "所以**不计入**上面四层，只能算廉价的第一道过滤，不构成安全保证。"
         )
 
-        # 这一条是自我纠正：早期版本把第 ④ 层叫成「AST 校验」，但它其实是正则 +
+        # 这一条是自我纠正：早期版本把应用层那层校验叫成「AST 校验」，但它其实是正则 +
         # 字符串检查，本项目从头到尾没有做过任何语法树解析。留着这句话，比悄悄删掉
         # 更能证明这套边界说明是核过的。
         st.info(
             "**关于命名的自我纠正**：本项目**没有**做语法树（AST）解析。"
-            "第 ④ 层是写操作关键字正则 + 多语句拒绝 + 首关键字白名单；"
+            "应用层前置校验是写操作关键字正则 + 多语句拒绝 + 首关键字白名单；"
             "真正带结构信息的是 SQLite 自己的 authorizer 回调（第 ②③ 层）。"
             "早期版本的界面与文档把这一层写成“AST 校验”，属于用词夸大，现已全部改回“只读护栏”。"
         )

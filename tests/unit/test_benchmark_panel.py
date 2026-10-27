@@ -280,22 +280,76 @@ def test_词面相似度与重排分值不得混为一谈(app: AppTest, markdown
 
 MANIFEST = ROOT / "reports" / "stage1_manifest.json"
 
+# 被禁止的旧口径（源码里写的是 four）。这里用相邻字面量拼出来，是为了让全仓 grep
+# 搜不到旧说法——旧口径不该在任何文件里以「看起来像在用的样子」出现，而下面的断言
+# 仍然盯着这个字符串本身。
+FORBIDDEN_LAYER_COUNT = "五" "层"
+
 
 def _frame_text(frame) -> str:
     return "\n".join(str(value) for value in frame.to_numpy().ravel())
 
 
-def test_架构边界页把五层只读护栏逐层列清(app: AppTest) -> None:
-    """护栏不是一句「我们做了只读」，是五层独立机制；页面必须逐层给机制和代码位置。"""
-    from app.streamlit_app import READONLY_LAYERS
+def test_架构边界页把四层库内护栏与一行应用层前置校验列清(app: AppTest) -> None:
+    """护栏口径以 ``src/agent/tools.py:9-16`` 的模块 docstring 为准：four independent layers。
 
-    assert len(READONLY_LAYERS) == 5, "护栏层数变了：先确认 src/agent/tools.py 再改这里"
+    页面必须列 4 行**库内强制**层，并把 ``validate_sql`` 单独放一行、显式标注**不计入**：
+    它只看 SQL 文本（``INSERT/**/INTO``、大小写、注释、嵌入 CTE 都能绕过），只是廉价的
+    第一道过滤，不是安全保证。这条断言故意写得比「行数相等」更死——它存在的意义就是
+    防止以后又把应用层那行并回护栏，或把「预算」与「行数截断」拆成两层凑回旧口径。
+    """
+    from app.streamlit_app import APPLICATION_PRE_CHECK, READONLY_LAYERS
+
+    # ① 计数口径：源码写的是 four，不是 five
+    assert len(READONLY_LAYERS) == 4, (
+        "库内护栏必须是 4 层，与 src/agent/tools.py:9-16 的 docstring"
+        "（read-only at four independent layers）一致"
+    )
     frame = _frame_with(app, "层")
-    assert list(frame["层"]) == [layer for layer, _, _ in READONLY_LAYERS]
+    assert list(frame["库内强制"]) == ["是"] * 4 + ["否（不计入上述四层）"], (
+        "护栏表必须是「4 行库内强制=是 + 1 行库内强制=否（不计入上述四层）」的应用层前置校验"
+    )
+
+    # ② 四行库内层：序号、机制、代码位置都要能当场核对
     text = _frame_text(frame)
-    for layer, how, where in READONLY_LAYERS:
+    for index, (layer, how, where) in enumerate(READONLY_LAYERS, start=1):
+        assert str(layer).startswith("①②③④"[index - 1]), f"库内层序号错位：{layer}"
         assert how[:10] in text, f"{layer} 只给了名词，没给机制"
         assert where in text, f"{layer} 没标出代码位置，面试官没法当场核对"
+    assert not [x for x in frame["层"] if str(x).startswith(("⑤", "5"))], (
+        "护栏表又出现了第 ⑤ 层：src/agent/tools.py 只有四层"
+    )
+
+    # ③ 四层与源码的对应关系逐条钉死（防「预算」与「行数截断」被拆回两层凑数）
+    hows = [how for _, how, _ in READONLY_LAYERS]
+    assert "mode=ro" in hows[0], "第 ① 层不是文件级只读连接（mode=ro）"
+    assert "set_authorizer" in hows[1], "第 ② 层不是 authorizer 回调按动作码拒绝"
+    assert "白名单" in hows[2], "第 ③ 层不是表 / 列 / 函数白名单"
+    assert "set_progress_handler" in hows[3] and "fetchmany" in hows[3], (
+        "第 ④ 层是源码 docstring 里『row cap plus a VM-instruction budget』的同一层，不许拆开"
+    )
+
+    # ④ 应用层那行必须是否定表述，且写清为什么不计入
+    app_layer, why, where = APPLICATION_PRE_CHECK
+    assert "不计入" in app_layer, "应用层前置校验必须显式标注「不计入上述四层」"
+    assert app_layer in text, f"护栏表里没有这一行：{app_layer}"
+    assert why[:10] in text, "应用层那行没给机制"
+    assert where in text, "应用层那行没标出代码位置"
+    assert "validate_sql" in where, "应用层那行要指到 validate_sql，别指成 SQLite 内部机制"
+    assert "绕过" in why, "必须写明它为什么不算一层保证（可被 INSERT/**/INTO 等写法绕过）"
+
+    # ⑤ 整页（标题 / 卡片 / 表格 / caption）都不得再自称旧口径
+    page_text = "\n".join(
+        [text]
+        + [str(m.value) for m in app.markdown]
+        + [str(c.value) for c in getattr(app, "caption", [])]
+    )
+    assert FORBIDDEN_LAYER_COUNT not in page_text, (
+        f"页面上还留着「{FORBIDDEN_LAYER_COUNT}」的说法"
+    )
+    titles = [str(m.value) for m in app.markdown if "只读护栏的真实分层" in str(m.value)]
+    assert titles, "找不到护栏分层的标题"
+    assert "四层" in titles[0] and "应用层" in titles[0], f"标题口径没改：{titles[0]}"
 
 
 def test_护栏表引用的符号必须真的存在于_tools_py(app: AppTest) -> None:

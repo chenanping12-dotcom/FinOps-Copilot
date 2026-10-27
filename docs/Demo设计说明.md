@@ -198,12 +198,12 @@ BM25 与混合精排的 `Recall@5` 都是 `1.0000`（Dense 是 `0.9667`）。这
 | :--- | :--- |
 | ① 底层真实组件 | 检索链路 / 细粒度溯源 / Agent 编排 / 固定口径工具 / 只读长尾查询 / 自我纠错 / 数据基底——每条都给「可核对位置」的源码路径 |
 | ② 演示替身与设计权衡 | 自然语言生成层用 `LocalDemoProvider` 的原因、为什么演示时刻意不接大模型、真实数据接入范围与它的边界 |
-| ③ 只读护栏的真实分层 | 五层独立机制（文件级只读 / authorizer 回调 / 表列函数白名单 / 语句形态检查 / 预算与结果集上限），每层给代码位置 |
+| ③ 只读护栏的真实分层 | 四层**库内强制**（文件级只读 / authorizer 回调 / 表列函数白名单 / 预算与结果集上限）+ 单列一行应用层前置校验 `validate_sql`，并显式标注它**不计入上述四层**；每层给代码位置 |
 
 ### 一处自我纠正：本项目没有做过「AST 校验」
 
-早期版本的界面与文档把第 ④ 层写成「AST 校验」，**属于用词夸大**：
-`ReadOnlyGuard.validate_sql()` 只是写操作关键字正则 + 拒绝多语句 + 首关键字白名单，
+早期版本的界面与文档把这一层（应用层前置校验，`ReadOnlyGuard.validate_sql()`）写成「AST 校验」，
+**属于用词夸大**：它只是写操作关键字正则 + 拒绝多语句 + 首关键字白名单，
 真正的结构信息来自 **SQLite 自己的 `authorizer` 回调**（第 ②③ 层）。
 仓库里从未 import 过 `ast` 去解析 SQL。
 
@@ -258,7 +258,7 @@ question
             ├─ route        意图分流：metric / sql / refuse
             ├─ MetricTool   固定 schema，防口径漂移（order_count / revenue /
             │               avg_order_value / cancel_rate × category/merchant/status/month）
-            ├─ SafeSQLTool  只读长尾查询 + 只读护栏五层（拒绝写操作）
+            ├─ SafeSQLTool  只读长尾查询 + 只读护栏四层库内强制（另有应用层前置校验，不计入这四层）
             ├─ Reflector    报错与异常值自我纠错，最多重试 2 次
             └─ answer       只用工具真实返回的数字组织回答
   └─ _decision_panel(agent_payload, rag_payload)   ← 中栏
@@ -341,7 +341,7 @@ question
    代价是少一点表格式的整齐，换来全部信息默认可见。
 
 两个防回归守卫在 `tests/unit/test_benchmark_panel.py`：
-`test_架构边界页的长文本不得退回_dataframe` 与 `test_架构边界页把五层只读护栏逐层列清`。
+`test_架构边界页的长文本不得退回_dataframe` 与 `test_架构边界页把四层库内护栏与一行应用层前置校验列清`。
 
 ---
 
@@ -354,7 +354,7 @@ question
 | `HybridRetriever` / BM25 / Dense / RRF / Cross-Encoder | **真实** | `src/rag/`，一行未改 |
 | `FinOpsAgent` LangGraph 状态机 | **真实** | `src/agent/graph.py` |
 | `MetricTool` / `SafeSQLTool` / `Reflector` | **真实** | `src/agent/` |
-| 只读护栏（五层） | **真实**，但**不该叫「AST 校验」** | `src/agent/tools.py:245 ReadOnlyGuard`。第 ④ 层是写操作关键字正则 + 拒绝多语句 + 首关键字白名单；真正带结构信息的是 **SQLite 自己的 `authorizer` 回调**（第 ②③ 层）。仓库从未 `import ast` 解析过 SQL，早期界面与文档里的「AST 校验」属于用词夸大，已全部改回「只读护栏」并留了自纠说明（§1.3） |
+| 只读护栏（四层库内强制 + 一层应用层前置校验） | **真实**，但**不该叫「AST 校验」** | `src/agent/tools.py:245 ReadOnlyGuard`。四层库内强制 = `mode=ro` 连接 / `authorizer` 按动作码拒绝 / 表列函数白名单 / 预算与行数上限——`tools.py:9-16` 的模块 docstring 写的就是 **four** independent layers；`validate_sql` 只是应用层的前置过滤，**不计入**这四层（只看 SQL 文本，可被 `INSERT/**/INTO`、注释、大小写绕过）。仓库从未 `import ast` 解析过 SQL，早期界面与文档里的「AST 校验」属于用词夸大，已全部改回「只读护栏」并留了自纠说明（§1.3） |
 | `create_app` / 语义缓存 / 主备故障转移 / SSE 降级 | **真实** | `src/gateway/` |
 | 订单库 `orders.db`（50,000 单） | **真实** | `scripts/` 合成，含 6 类业务脏数据 |
 | 规则语料 `chunks.jsonl`（5,000 片 / 250 文档） | **真实** | Stage 1 合成 |
